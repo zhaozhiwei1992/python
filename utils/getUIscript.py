@@ -28,7 +28,8 @@ import re
 # select * from fasp_T_diccolumn t where t.tablecode = '';
 
 import os
-#设置查询编码
+
+# 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # 连接数据库
 con = cx_Oracle.connect('pay_lhc170119/1@192.168.3.6/orcl')
@@ -48,6 +49,7 @@ def getColumnByTablecode(tablecode):
     res = cur.fetchall()
     return res
 
+
 # 创建删除语句
 def createDelSql(tablecode, code, map):
     sqls = []
@@ -55,8 +57,9 @@ def createDelSql(tablecode, code, map):
     sqls.append(sql)
     return sqls
 
+
 # 创建插入语句
-def createInsertSql(tablecode, code, map):
+def createInsertSql(tablecode, map):
     sqls = []
     sql = "insert into " + tablecode + "("
     for result in map.keys():
@@ -73,42 +76,21 @@ def createInsertSql(tablecode, code, map):
         else:
             if isinstance(string, (int)) is True:
                 string = str(string)
-            sql += '\'' + string + " " + '\''
+            sql += '\'' + string.replace('\'', '\'\'') + " " + '\''
         sql += ","
-    sql = sql[0: len(sql) - 1] + ")"
+    sql = sql[0: len(sql) - 1] + ");"
 
     sqls.append(sql)
     return sqls
 
-def createInsertAndDelSQL(tablecode, code, map):
-    sqls = []
 
-    #delete sql
-    sql = "delete from " + tablecode + " t where t." + code + " = '" + map[code.lower()] + "';"
-    sqls.append(sql)
-
-    #insert sql
-    sql = "insert into " + tablecode + "("
-    for result in map.keys():
-        sql += result
-        sql += ","
-    sql = sql[0: len(sql) - 1]
-    sql += ") values ("
-    for result in map.keys():
-        string = map[result.lower()]
-        if (result.upper() == "GUID") and (tablecode.lower() != "fasp_t_pabusinessmould"):
-            sql += 'sys_guid()'
-        elif string is None:
-            sql += 'null'
-        else:
-            if isinstance(string, (int)) is True:
-                string = str(string)
-            sql += '\'' + string + " " + '\''
-        sql += ","
-    sql = sql[0: len(sql) - 1] + ")"
-
-    sqls.append(sql)
+def createInsertAndDelSQL(tablecode, map):
+    # delete sql
+    sqls = createDelSql(tablecode, map)
+    # insert sql
+    sqls.append(createInsertSql(tablecode, map))
     return sqls
+
 
 def getPabusinessmouldconfig(mouldid):
     dicts = getRecordSet('fasp_t_pabusinessmouldconfig', 'mouldid', mouldid)
@@ -116,34 +98,40 @@ def getPabusinessmouldconfig(mouldid):
     for dict in dicts:
         sqls = createInsertAndDelSQL('fasp_t_pabusinessmouldconfig', 'mouldid', dict)
 
-    return  sqls
+    return sqls
 
 
 def getPageconsoleByURL(url):
     dicts = getRecordSet('bus_t_pageconsole', 'url', url)
-    for dict in dicts:
-        sqls = createInsertAndDelSQL('bus_t_pageconsole', 'url', dict)
-    return  sqls
+    for map in dicts:
+        sqls = createInsertAndDelSQL('bus_t_pageconsole', 'url', map)
+    return sqls
+
 
 # 获取按钮区配置信息
 def getUIFunction(config):
-    return  getConfigDetail('busfw_t_uifunction', config)
+    return getConfigDetail('busfw_t_uifunction', config)
+
 
 # 获取查询区配置信息
 def getUIQueryform(config):
-    return  getConfigDetail('busfw_t_uiqueryform', config)
+    return getConfigDetail('busfw_t_uiqueryform', config)
+
 
 # 获取列表区配置信息
 def getUIDatatable(config):
-    return  getConfigDetail('busfw_t_uitable', config)
+    return getConfigDetail('busfw_t_uitable', config)
+
 
 # 获取页签配置信息
 def getUITabPage(config):
-    return  getConfigDetail('busfw_t_uitabpage', config)
+    return getConfigDetail('busfw_t_uitabpage', config)
+
 
 # 获取编辑区配置信息
 def getUIeditform(config):
-    return  getConfigDetail('busfw_t_uieditform', config)
+    return getConfigDetail('busfw_t_uieditform', config)
+
 
 # 获取界面组件
 def getPagecomponent(id):
@@ -154,12 +142,14 @@ def getPagecomponent(id):
     for dict in dicts:
         if len(delsql) == 0:
             delsql.extend(createDelSql(tablecode, 'id', dict))
-        sqls.extend(createInsertSql(tablecode, 'id', dict))
+        sqls.extend(createInsertSql(tablecode, dict))
     delsql.extend(sqls)
-    return  delsql
+    return delsql
 
-#根据配置表及配置信息获取详细配置
+
+# 根据配置表及配置信息获取详细配置
 def getConfigDetail(tablecode, config):
+    # 格式化成python可以解析的json格式 {"key":"value"}
     config = re.sub(r"(,?)(\w+?)\s*?:", r"\1'\2':", config).replace('\'', '\"')
     dicts = json.loads(config)
     key = dicts["key"]
@@ -170,14 +160,14 @@ def getConfigDetail(tablecode, config):
     for dict in dicts:
         if len(delsql) == 0:
             delsql.extend(createDelSql(tablecode, 'key', dict))
-        sqls.extend(createInsertSql(tablecode, 'key', dict))
+        sqls.extend(createInsertSql(tablecode, dict))
 
     delsql.extend(sqls)
-    return  delsql
+    return delsql
 
 
 def getUIDatacolumns(config):
-    return  getConfigDetail('busfw_t_uicolumn', config)
+    return getConfigDetail('busfw_t_uicolumn', config)
 
 
 def getPageconsolecomconfigByURL(url):
@@ -187,7 +177,7 @@ def getPageconsolecomconfigByURL(url):
     for dict in dicts:
         if len(delsql) == 0:
             delsql.extend(createDelSql('bus_t_pageconsolecomconfig', 'url', dict))
-        sqls.extend(createInsertSql('bus_t_pageconsolecomconfig', 'url', dict))
+        sqls.extend(createInsertSql('bus_t_pageconsolecomconfig', dict))
 
     # 创建各个组件的脚本
     for dict in dicts:
@@ -208,14 +198,15 @@ def getPageconsolecomconfigByURL(url):
         else:
             pass
     delsql.extend(sqls)
-    return  delsql
+    return delsql
+
 
 # 根据传入信息获取dict类型数据
 def getRecordSet(tablecode, pkcode, pk):
-    #获取表字段
+    # 获取表字段
     columns = getColumnByTablecode(tablecode.upper())
 
-    #查询字段 这里为了与后台转换dict时对应
+    # 查询字段 这里为了与后台转换dict时对应
     columnStr = ''
     for result in columns:
         columnStr += result[0]
@@ -227,6 +218,7 @@ def getRecordSet(tablecode, pkcode, pk):
     dicts = tuple2dict(cur, columns)
     return dicts
 
+
 def getPabusinessmouldmenu(mouldid):
     dicts = getRecordSet('FASP_T_PABUSINESSMODELMENU', 'mouldid', mouldid)
     delsql = []
@@ -234,12 +226,13 @@ def getPabusinessmouldmenu(mouldid):
     for dict in dicts:
         if len(delsql) == 0:
             delsql.extend(createDelSql('FASP_T_PABUSINESSMODELMENU', 'mouldid', dict))
-        sqls.extend(createInsertSql('FASP_T_PABUSINESSMODELMENU', 'mouldid', dict))
+        sqls.extend(createInsertSql('FASP_T_PABUSINESSMODELMENU', dict))
         sqls.extend(getPageconsoleByURL(dict["menuurl"]))
         sqls.extend(getPageconsolecomconfigByURL(dict["menuurl"]))
 
     delsql.extend(sqls)
     return delsql
+
 
 # 返回的tuple结果集转成dict, 如果oracle支持直接转换成dict就不需要该逻辑
 def tuple2dict(cur, columns):
@@ -253,14 +246,16 @@ def tuple2dict(cur, columns):
         resultSet.append(dic)
     return resultSet
 
+
 def whiletoFile(sqls):
     pass
+
 
 # 获取模板信息
 def getPabusinessmould(guid):
     dicts = getRecordSet('fasp_t_pabusinessmould', 'guid', guid)
     for dict in dicts:
-        sqls = createInsertAndDelSQL('fasp_t_pabusinessmould', 'guid', dict)
+        sqls = createInsertAndDelSQL('fasp_t_pabusinessmould', dict)
         # extend将另一个列表的元素加入到原列表
         sqls.extend(getPabusinessmouldconfig(dict["guid"]))
         sqls.extend(getPabusinessmouldmenu(dict["guid"]))
@@ -269,6 +264,8 @@ def getPabusinessmould(guid):
 
     # 写入到文件
     whiletoFile(sqls)
-if __name__ == "__main__" :
+
+
+if __name__ == "__main__":
     getPabusinessmould('50BA2350F9AD4563B4BFE939A6A05186')
     con.close()
