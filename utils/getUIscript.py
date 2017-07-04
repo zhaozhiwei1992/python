@@ -84,9 +84,9 @@ def createInsertSql(tablecode, map):
     return sqls
 
 
-def createInsertAndDelSQL(tablecode, map):
+def createInsertAndDelSQL(tablecode, code, map):
     # delete sql
-    sqls = createDelSql(tablecode, map)
+    sqls = createDelSql(tablecode, code, map)
     # insert sql
     sqls.append(createInsertSql(tablecode, map))
     return sqls
@@ -255,7 +255,7 @@ def whiletoFile(sqls):
 def getPabusinessmould(guid):
     dicts = getRecordSet('fasp_t_pabusinessmould', 'guid', guid)
     for dict in dicts:
-        sqls = createInsertAndDelSQL('fasp_t_pabusinessmould', dict)
+        sqls = createInsertAndDelSQL('fasp_t_pabusinessmould', 'guid', dict)
         # extend将另一个列表的元素加入到原列表
         sqls.extend(getPabusinessmouldconfig(dict["guid"]))
         sqls.extend(getPabusinessmouldmenu(dict["guid"]))
