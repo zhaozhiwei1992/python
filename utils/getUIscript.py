@@ -88,7 +88,7 @@ def createInsertAndDelSQL(tablecode, code, map):
     # delete sql
     sqls = createDelSql(tablecode, code, map)
     # insert sql
-    sqls.append(createInsertSql(tablecode, map))
+    sqls.extend(createInsertSql(tablecode, map))
     return sqls
 
 
@@ -267,5 +267,5 @@ def getPabusinessmould(guid):
 
 
 if __name__ == "__main__":
-    getPabusinessmould('50BA2350F9AD4563B4BFE939A6A05186')
+    getPabusinessmould('437A05D24863A1E540612AA5NCKLKJHG')
     con.close()
