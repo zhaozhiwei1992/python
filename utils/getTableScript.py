@@ -15,7 +15,7 @@ def droptable(tablename, viewname):
     sqlList.append("execute immediate 'drop table " + tablename + "';")
     sqlList.append("end if;")
     sqlList.append("execute immediate'")
-    sqlList.append("create table P#PAY_T_ORDER")
+    sqlList.append("create table " + tablename)
     sqlList.append("(")
 
     #字段信息
@@ -73,8 +73,8 @@ def droptable(tablename, viewname):
 
 if __name__ == '__main__':
     # tablecode
-    tablename = 'p#BDG_T_BDGMAIN'
+    tablename = 'P#BDG_T_LOADMAIN'
     # viewname
-    viewname = 'BDG_T_BDGMAIN'
+    viewname = 'BDG_T_LOADMAIN'
     print(droptable(tablename, viewname))
 
