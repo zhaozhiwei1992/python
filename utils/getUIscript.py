@@ -76,7 +76,7 @@ def createInsertSql(tablecode, map):
         else:
             if isinstance(string, (int)) is True:
                 string = str(string)
-            sql += '\'' + string.replace('\'', '\'\'') + " " + '\''
+            sql += '\'' + string.replace('\'', '\'\'') + '\''
         sql += ","
     sql = sql[0: len(sql) - 1] + ");"
 
@@ -263,9 +263,9 @@ def getPabusinessmould(guid):
             print(sql)
 
     # 写入到文件
-    whiletoFile(sqls)
+    # whiletoFile(sqls)
 
 
 if __name__ == "__main__":
-    getPabusinessmould('437A05D24863A1E540612AA5NCKLKJHG')
+    getPabusinessmould('50BA2350F9AD4563B4BFE939A6A05186')
     con.close()
