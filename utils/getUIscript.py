@@ -69,9 +69,11 @@ def createInsertSql(tablecode, map):
     sql += ") values ("
     for result in map.keys():
         string = map[result.lower()]
-        if (result.upper() == "GUID") and (tablecode.lower() != "fasp_t_pabusinessmould"):
+        if (result.upper() == "GUID" or result.upper() == "COLUMNID") and (tablecode.lower() != "fasp_t_pabusinessmould"):
             sql += 'sys_guid()'
         elif string is None:
+            sql += 'null'
+        elif result.lower() == "dbversion":
             sql += 'null'
         else:
             if isinstance(string, (int)) is True:
@@ -265,7 +267,36 @@ def getPabusinessmould(guid):
     # 写入到文件
     # whiletoFile(sqls)
 
+# 表注册信息
+def getdictableAndColumns(tablecode):
+    dictableSqls = []
+    # dictable
+    dicts = getRecordSet('fasp_t_dictable', 'tablecode', tablecode)
+    for dict in dicts:
+        dictableSqls = createInsertAndDelSQL('fasp_t_dictable', 'tablecode', dict)
+
+    # diccolumn
+    dicts = getRecordSet('fasp_t_diccolumn', 'tablecode', tablecode)
+    sqls = []
+    delsql = []
+    for dict in dicts:
+        if len(delsql) == 0:
+            delsql.extend(createDelSql('fasp_t_diccolumn', 'tablecode', dict))
+        sqls.extend(createInsertSql('fasp_t_diccolumn', dict))
+    delsql.extend(sqls)
+
+    dictableSqls.extend(delsql)
+    return dictableSqls
+
+
 
 if __name__ == "__main__":
-    getPabusinessmould('50BA2350F9AD4563B4BFE939A6A05186')
+    #获取界面配置信息
+    getPabusinessmould('2395F892FE0FB5723E07BCE9DBC1B760')
+
+    # 获取表注册信息
+    # sqls = getdictableAndColumns('BDG_T_BDGSUB')
+    # for sql in sqls:
+    #     print(sql)
+
     con.close()
