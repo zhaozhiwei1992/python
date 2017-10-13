@@ -49,7 +49,7 @@ def getPubmenuByAppid(appid):
 # select * from busfw_t_uitable t where t.key = '/pay/approvalform/edit/expand/maindatatable';
 # select * from busfw_t_uicolumn t where t.key = '/pay/approvalform/edit/expand/maindatatable';
 def getUIPageByAppid(appid):
-    condition =  "select t.uikey from fasp_t_papage t where t.vchtypeid is null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = \'" + appid +"\')"
+    condition =  "select t.uikey from fasp_t_papage t where t.vchtypeid is not null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = \'" + appid +"\')"
     sqls = []
     #busfw_t_uifunction
     sqls.extend(getConfigDetail("busfw_t_uifunction", "key", condition))
