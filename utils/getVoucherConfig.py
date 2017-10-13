@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import cx_Oracle
 import os
 
@@ -11,22 +12,6 @@ cur = con.cursor()
 #涉及表如下:
 #p#fasp_t_pavoucher(单据), p#fasp_t_papage(关系), fasp_t_pubmenu(菜单), busfw_t_uixxxx, 规则表(一些过滤条件)
 #俩种方式:
-if __name__ == "__main__":
-    #粗暴: 所有的都根据模版id获取（从整体查询， insert脚本直接关系不明确， 程序只需要查询，做成插入脚本即可）
-    appid = "bdg"
-    sqls = []
-    sqls.extend(getVoucherConfigByAppid(appid))
-    sqls.extend(getPubmenuByAppid(appid))
-    sqls.extend(getPapageByAppid(appid))
-    sqls.extend(getUIPageByAppid(appid))
-    for sql in sqls:
-            print(sql)
-    con.close()
-
-    #优雅: 每一级循环， 通过每个模板找到各自的多个单据， 每个单据找各自的配置， 代码中循环较多, 出来的脚本有关系
-    #for loop 模版guid
-    # getVouchConfigByMouldID()
-    #end loop
 
 #根据某一个模板查询所有单据
 #select * from fasp_t_pavoucher t where t.mouldid = '';
@@ -36,9 +21,9 @@ def getVouchConfigByMouldID(mouldid):
 
 #select * from fasp_t_pavoucher t where t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '');
 def getVoucherConfigByAppid(appid):
-    condition="'" + appid +"'"
+    condition='\'' + appid + '\''
     sqls = []
-    sqls.extend(getConfigDetail("fasp_t_pubmenu", "appid", condition))
+    sqls.extend(getConfigDetail("fasp_t_pavoucher", "appid", condition))
     return sqls
 
 #select * from fasp_t_papage t where t.vchtypeid is null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '');
@@ -64,7 +49,7 @@ def getPubmenuByAppid(appid):
 # select * from busfw_t_uitable t where t.key = '/pay/approvalform/edit/expand/maindatatable';
 # select * from busfw_t_uicolumn t where t.key = '/pay/approvalform/edit/expand/maindatatable';
 def getUIPageByAppid(appid):
-    condition =  "select t.guid from fasp_t_papage t where t.vchtypeid is null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = \'" + appid +"\');"
+    condition =  "select t.uikey from fasp_t_papage t where t.vchtypeid is null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = \'" + appid +"\')"
     sqls = []
     #busfw_t_uifunction
     sqls.extend(getConfigDetail("busfw_t_uifunction", "key", condition))
@@ -149,3 +134,31 @@ def getConfigDetail(tablecode, code, condition):
         sqls.extend(createInsertSql(tablecode, dict))
     delsql.extend(sqls)
     return delsql
+
+def getColumnByTablecode(tablecode):
+    sql = "select t.column_name from user_tab_columns t where t.table_name = :table_name"
+    cur.prepare(sql)
+    cur.execute(None, {'table_name': tablecode.upper()})
+    res = cur.fetchall()
+    return res
+
+
+if __name__ == "__main__":
+    #粗暴: 所有的都根据模版id获取（从整体查询， insert脚本直接关系不明确， 程序只需要查询，做成插入脚本即可）
+    sql = 'SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM(\'\',\'1500\',\'2017\',\'\') FROM DUAL'
+    cur.execute(sql)
+    appid = "bdg"
+    sqls = []
+    sqls.extend(getVoucherConfigByAppid(appid))
+    # sqls.extend(getPubmenuByAppid(appid))
+    sqls.extend(getPapageByAppid(appid))
+    sqls.extend(getUIPageByAppid(appid))
+    for sql in sqls:
+        #encode ref
+        print(sql.decode('GBK').encode('UTF-8'))
+    con.close()
+
+    #优雅: 每一级循环， 通过每个模板找到各自的多个单据， 每个单据找各自的配置， 代码中循环较多, 出来的脚本有关系
+    #for loop 模版guid
+    # getVouchConfigByMouldID()
+    #end loop
