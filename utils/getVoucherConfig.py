@@ -5,32 +5,32 @@ import os
 # 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # 连接数据库
-con = cx_Oracle.connect('pay_lhc170119/1@192.168.3.6/orcl')
+con = cx_Oracle.connect('pay_cd20170921/1@192.168.3.58/orcl')
 cur = con.cursor()
 
 #根据系统标识获取单据配置信息,生成一系列相关脚本
 #涉及表如下:
-#p#fasp_t_pavoucher(单据), p#fasp_t_papage(关系), fasp_t_pubmenu(菜单), busfw_t_uixxxx, 规则表(一些过滤条件)
+#p#fasp_t_pavoucher(单据), p#P#fasp_t_papage(关系), fasp_t_pubmenu(菜单), busfw_t_uixxxx, 规则表(一些过滤条件)
 #俩种方式:
 
 #根据某一个模板查询所有单据
-#select * from fasp_t_pavoucher t where t.mouldid = '';
+#select * from p#fasp_t_pavoucher t where t.mouldid = '';
 def getVouchConfigByMouldID(mouldid):
     #单据id获取菜单, 获取papage, 获取uiconfig
     pass
 
-#select * from fasp_t_pavoucher t where t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '');
+#select * from p#fasp_t_pavoucher t where t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '');
 def getVoucherConfigByAppid(appid):
     condition='\'' + appid + '\''
     sqls = []
-    sqls.extend(getConfigDetail("fasp_t_pavoucher", "appid", condition))
+    sqls.extend(getConfigDetail("p#fasp_t_pavoucher", "appid", condition))
     return sqls
 
-#select * from fasp_t_papage t where t.vchtypeid is null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '');
+#select * from P#fasp_t_papage t where t.vchtypeid is null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '');
 def getPapageByAppid(appid):
     condition = "select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '" + appid +"'"
     sqls = []
-    sqls.extend(getConfigDetail("fasp_t_papage", "mouldid", condition))
+    sqls.extend(getConfigDetail("P#fasp_t_papage", "mouldid", condition))
     return sqls
 
 #select * from fasp_t_pubmenu t where t.appid = ''
@@ -49,7 +49,7 @@ def getPubmenuByAppid(appid):
 # select * from busfw_t_uitable t where t.key = '/pay/approvalform/edit/expand/maindatatable';
 # select * from busfw_t_uicolumn t where t.key = '/pay/approvalform/edit/expand/maindatatable';
 def getUIPageByAppid(appid):
-    condition =  "select t.uikey from fasp_t_papage t where t.vchtypeid is not null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = \'" + appid +"\')"
+    condition =  "select t.uikey from P#fasp_t_papage t where t.vchtypeid is not null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = \'" + appid +"\')"
     sqls = []
     #busfw_t_uifunction
     sqls.extend(getConfigDetail("busfw_t_uifunction", "key", condition))
@@ -97,7 +97,7 @@ def createDelSql(tablecode, code, condition):
     sqls.append(sql)
     return sqls
 
-# 创建插入语句
+# 创建插入语句, cant update fasp_t_pabusinessmould's and fasp_t_pubmenu's guid
 def createInsertSql(tablecode, map):
     sqls = []
     sql = "insert into " + tablecode + "("
@@ -108,7 +108,7 @@ def createInsertSql(tablecode, map):
     sql += ") values ("
     for result in map.keys():
         string = map[result.lower()]
-        if (result.upper() == "GUID" or result.upper() == "COLUMNID") and (tablecode.lower() != "fasp_t_pabusinessmould"):
+        if (result.upper() == "GUID" or result.upper() == "COLUMNID") and (tablecode.lower() != "fasp_t_pabusinessmould" and tablecode.lower() != "fasp_t_pubmenu" and tablecode.lower() != "p#fasp_t_pavoucher"):
             sql += 'sys_guid()'
         elif string is None:
             sql += 'null'
@@ -145,18 +145,25 @@ def getColumnByTablecode(tablecode):
 
 if __name__ == "__main__":
     #粗暴: 所有的都根据模版id获取（从整体查询， insert脚本直接关系不明确， 程序只需要查询，做成插入脚本即可）
-    sql = 'SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM(\'\',\'1500\',\'2017\',\'\') FROM DUAL'
-    cur.execute(sql)
+    # sql = 'SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM(\'\',\'510100\',\'2018\',\'\') FROM DUAL'
+    # cur.execute(sql)
     appid = "bdg"
     sqls = []
-    sqls.extend(getVoucherConfigByAppid(appid))
+    #
+    # sqls.extend(getVoucherConfigByAppid(appid))
     # sqls.extend(getPubmenuByAppid(appid))
-    sqls.extend(getPapageByAppid(appid))
+    # sqls.extend(getPapageByAppid(appid))
     sqls.extend(getUIPageByAppid(appid))
+    # for sql in sqls:
+    #     #encode ref
+    #     print(sql.decode('GBK').encode('UTF-8'))
+
+    f = open('/home/lx7ly/Documents/uiconfig_fasp.sql', 'w')  # r只读，w可写，a追加
     for sql in sqls:
-        #encode ref
-        print(sql.decode('GBK').encode('UTF-8'))
-    con.close()
+        #decode need by python2
+        # f.write(sql.decode('GBK').encode('UTF-8') + '\n')
+        f.write(sql + '\n')
+    # con.close()
 
     #优雅: 每一级循环， 通过每个模板找到各自的多个单据， 每个单据找各自的配置， 代码中循环较多, 出来的脚本有关系
     #for loop 模版guid
