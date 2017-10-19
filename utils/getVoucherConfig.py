@@ -5,7 +5,7 @@ import os
 # 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # 连接数据库
-con = cx_Oracle.connect('pay_cd20170921/1@192.168.3.58/orcl')
+con = cx_Oracle.connect('fasp_cd20170921/1@192.168.3.58/orcl')
 cur = con.cursor()
 
 #根据系统标识获取单据配置信息,生成一系列相关脚本
@@ -151,9 +151,9 @@ if __name__ == "__main__":
     sqls = []
     #
     # sqls.extend(getVoucherConfigByAppid(appid))
-    # sqls.extend(getPubmenuByAppid(appid))
+    sqls.extend(getPubmenuByAppid(appid))
     # sqls.extend(getPapageByAppid(appid))
-    sqls.extend(getUIPageByAppid(appid))
+    # sqls.extend(getUIPageByAppid(appid))
     # for sql in sqls:
     #     #encode ref
     #     print(sql.decode('GBK').encode('UTF-8'))
