@@ -8,7 +8,7 @@ def droptable(tablename, viewname):
     sqlList.append("begin")
     sqlList.append("select count(1) into num from user_constraints t where t.table_name = '" + tablename + "';")
     sqlList.append("if num > 0 then")
-    sqlList.append("execute immediate 'alter table P#PAY_T_ORDER drop constraint PK_" + viewname + " cascade drop index';")
+    sqlList.append("execute immediate 'alter table " + tablename + " drop constraint PK_" + viewname + " cascade drop index';")
     sqlList.append("end if;")
     sqlList.append("select count(1) into num from user_tables where TABLE_NAME = '" + tablename + "';")
     sqlList.append("if   num=1   then")
