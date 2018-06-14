@@ -73,8 +73,8 @@ def droptable(tablename, viewname):
 
 if __name__ == '__main__':
     # tablecode
-    tablename = 'P#BDG_T_LOADMAIN'
+    tablename = 'P#PAY_T_PAYSUB'
     # viewname
-    viewname = 'BDG_T_LOADMAIN'
+    viewname = 'PAY_T_PAYSUB'
     print(droptable(tablename, viewname))
 

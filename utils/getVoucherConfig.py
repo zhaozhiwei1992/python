@@ -5,7 +5,7 @@ import os
 # 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # 连接数据库
-con = cx_Oracle.connect('fasp_cd20170921/1@192.168.3.58/orcl')
+con = cx_Oracle.connect('fasp_150001/1@192.168.3.41/orcl')
 cur = con.cursor()
 
 #根据系统标识获取单据配置信息,生成一系列相关脚本
@@ -114,6 +114,10 @@ def createInsertSql(tablecode, map):
             sql += 'null'
         elif result.lower() == "dbversion":
             sql += 'null'
+        elif result.lower() == "province":
+            sql += '1500'
+        elif result.lower() == "year":
+            sql += '2018'
         else:
             if isinstance(string, (int)) is True:
                 string = str(string)
@@ -145,20 +149,20 @@ def getColumnByTablecode(tablecode):
 
 if __name__ == "__main__":
     #粗暴: 所有的都根据模版id获取（从整体查询， insert脚本直接关系不明确， 程序只需要查询，做成插入脚本即可）
-    # sql = 'SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM(\'\',\'510100\',\'2018\',\'\') FROM DUAL'
-    # cur.execute(sql)
+    sql = 'SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM(\'\',\'1500\',\'2018\',\'\') FROM DUAL'
+    cur.execute(sql)
     appid = "bdg"
     sqls = []
     #
-    # sqls.extend(getVoucherConfigByAppid(appid))
+    #sqls.extend(getVoucherConfigByAppid(appid))
     sqls.extend(getPubmenuByAppid(appid))
-    # sqls.extend(getPapageByAppid(appid))
-    # sqls.extend(getUIPageByAppid(appid))
+    #sqls.extend(getPapageByAppid(appid))
+    #sqls.extend(getUIPageByAppid(appid))
     # for sql in sqls:
-    #     #encode ref
+        #encode ref
     #     print(sql.decode('GBK').encode('UTF-8'))
 
-    f = open('/home/lx7ly/Documents/uiconfig_fasp.sql', 'w')  # r只读，w可写，a追加
+    f = open('/home/lx7ly/Documents/pubmenu_bdg.sql', 'w')  # r只读，w可写，a追加
     for sql in sqls:
         #decode need by python2
         # f.write(sql.decode('GBK').encode('UTF-8') + '\n')
