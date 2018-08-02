@@ -1,8 +1,0 @@
-#åignore foo.txt
-foo.txt
-# ignore html
-*.html
-# no ignore foo.html
-!foo.html
-#ignore all .o and .a
-*.[oa]
