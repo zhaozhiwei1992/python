@@ -14,7 +14,7 @@ text = pyperclip.paste()
 #手机号匹配正则表达式 ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+.[A-Za-z]{2,4}
 emailRegex = re.compile(r"""
 ([a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+.[A-Za-z]{2,4})
-""",re.VERBOSE)
+""", re.VERBOSE)
 result = emailRegex.findall(text)
 if len(result) < 1:
     print("请将要匹配的数据复制到系统剪贴板")
