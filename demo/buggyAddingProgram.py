@@ -1,0 +1,10 @@
+print('Enter the first number to add:')
+first = input()
+print('Enter the second number to add:')
+second = input()
+print('Enter the third number to add:')
+third = input()
+# 这里是字符串连接, 结果是错的
+print('The sum is ' + first + second + third)
+sum=int(first) + int(second) + int(third)
+print('The sum is ' + str(sum))
