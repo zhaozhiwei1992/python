@@ -24,7 +24,7 @@ def popSort(arr):
                 mixnum = arr[j] 
                 arr[j] = arr[j+1]
                 arr[j+1] = mixnum
-            # print("第 " + str(i) + " 趟结果: " + str(arr))
+            print("第 " + str(i) + " 趟结果: " + str(arr))
     return arr;
 arr = popSort(arr)
 print("排序后结果为: ", arr)

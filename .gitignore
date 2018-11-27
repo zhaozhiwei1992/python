@@ -1,3 +1,5 @@
+# cache
+__pycache__
 # project logs
 logs/
 out/
@@ -40,4 +42,3 @@ Thumbs.db
 # node_modules
 node_modules
 
-**/BaseTest.java
