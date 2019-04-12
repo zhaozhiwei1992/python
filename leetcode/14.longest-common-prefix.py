@@ -37,8 +37,12 @@
 # 
 #
 '''
+方法1： 太慢
 1. 遍历集合(也可以读取字符串位置)当前便利位置后续集合不存在返回空
 2. 最早结果存储到一个新得字符串返回
+
+2.换个思路，先排序
+不断减少字符串搜索 str.indexof()
 '''
 class Solution:
     def longestCommonPrefix(self, strs: List[str]) -> str:

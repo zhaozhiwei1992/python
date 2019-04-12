@@ -1,18 +1,25 @@
 strs=["aa","a"]
-firstStrSize=len(strs[0])
-returnStr=""
-firstStr = ""
-for i in range(firstStrSize):
-    for index, ele in enumerate(strs):
-        if(index == 0):
-            firstStr=ele[:i+1]
-        else:
-            if index >0 and firstStr != ele[:i+1]:
-                # return returnStr
-                break
-            elif index == (len(strs)-1):
-                returnStr = firstStr
-print(returnStr)
+strs.sort(key=lambda x:len(x))
+# print(strs)
+yourlen = len(strs[0]);
+for i in range(yourlen):
+    for ele in strs:
+        if str(ele).index(strs[0][:yourlen-i]) > -1:
+            print(strs[0][:yourlen-i])
+# firstStrSize=len(strs[0])
+# returnStr=""
+# firstStr = ""
+# for i in range(firstStrSize):
+#     for index, ele in enumerate(strs):
+#         if(index == 0):
+#             firstStr=ele[:i+1]
+#         else:
+#             if index >0 and firstStr != ele[:i+1]:
+#                 # return returnStr
+#                 break
+#             elif index == (len(strs)-1):
+#                 returnStr = firstStr
+# print(returnStr)
 # class Solution:
 #     def reverse(self, x: int) -> int:
 #         maxint = 2<<30

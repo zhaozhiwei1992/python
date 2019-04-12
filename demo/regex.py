@@ -13,3 +13,7 @@ print(greedyRegexMc.group())
 nogreedyRegex = re.compile(r"(Hello){3,5}?")
 nogreedyRegexMc = nogreedyRegex.search("HelloHelloHelloHelloHelloHello")
 print(nogreedyRegexMc.group())
+
+regex = re.compile(r"\(\)|\[\]|\{\}|""") 
+mc = regex.search('"([]"')
+print(mc != None)
