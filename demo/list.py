@@ -23,3 +23,10 @@ for s in list(s):
     if(stackLen> 0 and ((s == "]" and stack[stackLen-1] == "[") or (s == ")" and stack[stackLen-1] == "(") or (s == "}" and stack[stackLen-1] == "{") )):
         stack.pop()
 print(stack)
+
+nums=[1,1,2,3]
+print(len(set(nums)))
+
+# 牛逼的语法啊, for前面的num可以做其他操作然后构成集合
+nums = [num for num in range(6)]
+print (nums)
