@@ -7,7 +7,6 @@
 import shelve, pyperclip, sys
 
 mcbShelf = shelve.open('mcb')
-
 # Save clipboard content.
 if len(sys.argv) == 3 and sys.argv[1].lower() == 'save':
         mcbShelf[sys.argv[2]] = pyperclip.paste()
@@ -19,3 +18,9 @@ elif len(sys.argv) == 2:
         pyperclip.copy(mcbShelf[sys.argv[1]])
 
 mcbShelf.close()
+
+arr = ['a', 'b', 'c']
+arr.append('d')
+print(arr)
+arr.reverse();
+print(arr)
