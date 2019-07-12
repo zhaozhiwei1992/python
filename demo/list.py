@@ -11,6 +11,7 @@ print(animal[0::-1])
 print(animal[-2:-1])
 print(animal[::2])
 print(tuple(animal))
+
 #  必须完全匹配
 s=']'
 searchIdex=-1
