@@ -1,16 +1,23 @@
 animal=["cat", "dog", "pig"]
+#  全部输出
 print(animal)
+#  true
 print("pig" in animal)
 animal.append("eleph")
+# 反向输出
 animal.sort(reverse=True, key=str.lower)
+print('倒序输出animal -- begin')
 for i in range(0,len(animal)):
     print(animal[i])
+print('倒序输出animal -- end')
 
-print(animal[0:2])
-print(animal[0::-1])
-print(animal[-2:-1])
-print(animal[::2])
-print(tuple(animal))
+# 切片包括前数不包括后数
+print('0::2', animal[0:2])
+print('0::-1', animal[0::-1])
+print('0:-1', animal[0:-1])
+print('-2::-1', animal[-2:-1])
+print('::2', animal[::2])
+print('tuple', tuple(animal))
 
 #  必须完全匹配
 s=']'

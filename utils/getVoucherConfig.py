@@ -15,8 +15,32 @@ os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # 根据某一个模板查询所有单据
 # select * from p#fasp_t_pavoucher t where t.mouldid = '';
 def getVouchConfigByMouldID(mouldid):
+
+    global con
+    con = cx_Oracle.connect(connstr)
+    global cur
+    cur = con.cursor()
     #单据id获取菜单, 获取papage, 获取uiconfig
-    pass
+    # 粗暴: 所有的都根据模版id获取（从整体查询， insert脚本直接关系不明确， 程序只需要查询，做成插入脚本即可）
+    sqls = []
+
+    # sqls.extend(getVoucherConfigByAppid(appid))
+    #sqls.extend(getPubmenuByAppid(appid))
+    # sqls.extend(getPapageByAppid(appid))
+    # sqls.extend(getUIPageByAppid(appid))
+
+    # for sql in sqls:
+        # encode ref
+        # print(sql.decode('GBK').encode('UTF-8'))
+
+    outputfile = '/tmp/bdgvouchers.sql';
+    f = open(outputfile, 'w')  # r只读，w可写，a追加
+    for sql in sqls:
+        #decode need by python2
+        # f.write(sql.decode('GBK').encode('UTF-8') + '\n')
+        f.write(sql + '\n')
+    con.close()
+    print("sucess ......")
 
 # select * from p#fasp_t_pavoucher t where t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '');
 def getVoucherConfigByAppid(appid):
@@ -189,12 +213,12 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1 and sys.argv[1] == '-s':
         print('静默执行.......')
-        qprovince = "441200"
+        qprovince = "1500"
         qyear = "2018"
-        wprovince = "510105"
-        wyear = "2018"
+        wprovince = "4300"
+        wyear = "2020"
         # con = cx_Oracle.connect('fasp_4412/1@192.168.3.41/orcl')
-        connstr = "pay_4412/1@192.168.3.41/orcl"
+        connstr = "db_readonly/1@192.168.3.73/orcl"
         outputfile = "/tmp/config_bdg.sql"
         appid = "bdg"
     else:
