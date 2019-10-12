@@ -1,3 +1,8 @@
+nums = [2, 4, 6, 8, 9]
+#  所有大于２的数字乘以２后放入集合中
+nums = [ i*2 for i in nums if i > 2]
+print(nums)
+
 animal=["cat", "dog", "pig"]
 #  全部输出
 print(animal)
