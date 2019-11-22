@@ -1,6 +1,5 @@
 import urllib.request
 import requests         
-import os.path
 # import ctypes
 import re
 import time
