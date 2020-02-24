@@ -34,7 +34,7 @@ import os
 # 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # 连接数据库
-con = cx_Oracle.connect('pay_lhc170119/1@192.168.3.6/orcl')
+con = cx_Oracle.connect('fasp_test/1@192.168.3.41/orcl')
 
 # 查询模板信息 对每个模板下的所有配置信息进行查询
 #
@@ -278,6 +278,23 @@ def getPabusinessmould(guid):
             # 写入到文件
             # whiletoFile(sqls)
 
+# 获取模板信息
+def getPabusinessmouldByAppid(appid):
+    dicts = getRecordSet('fasp_t_pabusinessmould', 'appid', appid)
+    for dict in dicts:
+        sqls = createInsertAndDelSQL('fasp_t_pabusinessmould', 'guid', dict)
+        # extend将另一个列表的元素加入到原列表
+        sqls.extend(getPabusinessmouldconfig(dict["guid"]))
+        sqls.extend(getPabusinessmouldmenu(dict["guid"]))
+        # for sql in sqls:
+        #     print(sql)
+        f = open('/tmp/mouldconfig_005_cd_zzw.sql', 'a')  # r只读，w可写，a追加
+        for sql in sqls:
+            f.write(sql + '\n')
+
+            # 写入到文件
+            # whiletoFile(sqls)
+
 
 # 表注册信息
 def getdictableAndColumns(tablecode):
@@ -331,13 +348,31 @@ def getPageconsolecomconfigByJSON(jsonstr):
     delsql.extend(sqls)
     return delsql
 
+# 根据系统标识获取注册表
+def getdictableAndColumnsByAppid(appid):
+    dicts = getRecordSet('fasp_t_dictable', 'appid', appid)
+    for dict in dicts:
+        if dict["tablecode"] == 'BDG_T_COUNTRIES':
+            continue;
+        sqls = getdictableAndColumns(dict["tablecode"])
+        # for sql in sqls:
+        #     print(sql)
+        f = open('/tmp/tabledic_zzw.sql', 'a')  # r只读，w可写，a追加
+        for sql in sqls:
+            f.write(sql + '\n')
+
+            # 写入到文件
+            # whiletoFile(sqls)
+
 
 if __name__ == "__main__":
-    cur.execute("SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM('','1500','2017','') FROM DUAL")
+    cur.execute("SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM('','87','2016','') FROM DUAL")
     # 获取界面配置信息
-    getPabusinessmould('50BA23DJCKDNCK63BJDKCJ39A6A05186')
+    # getPabusinessmouldByAppid('bdg')
+    # getPabusinessmould('50BA23DJCKDNCK63BJDKCJ39A6A05186')
 
     # 获取表注册信息
+    getdictableAndColumnsByAppid("bdg")
     # sqls = getdictableAndColumns('BDG_T_BDGRECEIVEDATA')
     # for sql in sqls:
     #     print(sql)
