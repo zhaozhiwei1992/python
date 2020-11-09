@@ -4,6 +4,8 @@
 #
 # [26] Remove Duplicates from Sorted Array
 #
+from typing import List
+
 class Solution:
     def removeDuplicates(self, nums: List[int]) -> int:
         # 这个方式不行，要求不能重新创建list并且要改变原有的
@@ -36,7 +38,11 @@ class Solution:
             while jj<len(nums):
                 print(ii, '---', jj)
                 if nums[ii-1]!=nums[jj]:
+                    # 相邻数字不相等，则后移
+                    # 如果相等就跳过, 这样也相当于数据丢失
                     nums[ii]=nums[jj]
                     ii+=1
                 jj+=1
             return ii
+if __name__ == "__main__":
+    print("去重后结果", Solution().removeDuplicates([1,2,3]))

@@ -47,9 +47,9 @@ class Solution:
         minint = -2<<30
         if(x > maxint or (x <= minint)):
             return 0
-        # 反转
+        # 转字符串
         s = str(abs(x)) 
-        # int化
+        # 反转并int化
         i = int(s[::-1]) 
         if(x > 0 and i <= maxint):
             return i
@@ -57,3 +57,7 @@ class Solution:
             return 0-i
         else:
             return 0
+if __name__ == "__main__":
+    solution = Solution()
+    result =solution.reverse(123)
+    print(result)

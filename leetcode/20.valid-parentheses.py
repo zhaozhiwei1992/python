@@ -70,7 +70,13 @@ class Solution:
             if(s=="(" or s=="{" or s == "["):
                 stack.append(s)
             elif(stackLen> 0 and ((s == "]" and stack[stackLen-1] == "[") or (s == ")" and stack[stackLen-1] == "(") or (s == "}" and stack[stackLen-1] == "{") )):
+                # 如果闭括号匹配就出栈, 程序是顺序执行的，只有下一个和上一个匹配才正常，否则肯定不会再匹配
                 stack.pop()
             else:
                 return False
         return len(stack) == 0
+
+if __name__ == "__main__":
+
+    print(Solution().isValid("{()[]}")) #True
+    print(Solution().isValid("{(]}")) #False

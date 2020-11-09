@@ -24,10 +24,10 @@ def getVouchConfigByMouldID(mouldid):
     # 粗暴: 所有的都根据模版id获取（从整体查询， insert脚本直接关系不明确， 程序只需要查询，做成插入脚本即可）
     sqls = []
 
-    # sqls.extend(getVoucherConfigByAppid(appid))
+    sqls.extend(getVoucherConfigByAppid(appid))
     #sqls.extend(getPubmenuByAppid(appid))
-    # sqls.extend(getPapageByAppid(appid))
-    # sqls.extend(getUIPageByAppid(appid))
+    sqls.extend(getPapageByAppid(appid))
+    sqls.extend(getUIPageByAppid(appid))
 
     # for sql in sqls:
         # encode ref
@@ -44,14 +44,15 @@ def getVouchConfigByMouldID(mouldid):
 
 # select * from p#fasp_t_pavoucher t where t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '');
 def getVoucherConfigByAppid(appid):
-    condition=" appid = '" + appid + "'"
+    #condition=" appid = '" + appid + "'"
+    condition=" MOULDID in ('50BA2350F9AD4563NNJHKHknkj05186','50BA2350F9AD4563BJDKCJ3dnknj5186','50BA2350F9AD4563BJDKCJnknkj05186')"
     sqls = []
     sqls.extend(getConfigDetail("p#fasp_t_pavoucher", condition))
     return sqls
 
 # select * from P#fasp_t_papage t where t.vchtypeid is null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '');
 def getPapageByAppid(appid):
-    condition = " mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '" + appid +"')"
+    condition = " mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = '" + appid +"' and t2.guid in ('50BA2350F9AD4563NNJHKHknkj05186','50BA2350F9AD4563BJDKCJ3dnknj5186','50BA2350F9AD4563BJDKCJnknkj05186'))"
     sqls = []
     sqls.extend(getConfigDetail("P#fasp_t_papage", condition))
     return sqls
@@ -72,7 +73,7 @@ def getPubmenuByAppid(appid):
 # select * from busfw_t_uitable t where t.key = '/pay/approvalform/edit/expand/maindatatable';
 # select * from busfw_t_uicolumn t where t.key = '/pay/approvalform/edit/expand/maindatatable';
 def getUIPageByAppid(appid):
-    condition =  " key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid is not null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = \'" + appid +"\'))"
+    condition =  " key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid is not null and t.mouldid in (select t2.guid from fasp_t_pabusinessmould t2 where t2.appid = \'" + appid +"\' and t2.guid in ('50BA2350F9AD4563NNJHKHknkj05186','50BA2350F9AD4563BJDKCJ3dnknj5186','50BA2350F9AD4563BJDKCJnknkj05186')))"
     sqls = []
     #busfw_t_uifunction
     sqls.extend(getConfigDetail("p#busfw_t_uifunction", condition))
@@ -210,7 +211,6 @@ def generalSql():
     #end loop
 
 if __name__ == "__main__":
-
     if len(sys.argv) > 1 and sys.argv[1] == '-s':
         print('静默执行.......')
         qprovince = "1500"
@@ -226,8 +226,9 @@ if __name__ == "__main__":
         qyear = input("请输入查数年度, 例如2018：")
         wprovince = input("请输入写出财政, 例如1500：")
         wyear = input("请输入写出年度, 例如2018：")
-        # con = cx_Oracle.connect('fasp_4412/1@192.168.3.41/orcl')
+        #con = cx_Oracle.connect('fasp_4412/1@192.168.3.41/orcl')
         connstr = input("请输入数据库用户名密码, 例如:fasp_4412/1@192.168.3.41/orcl: ")
         outputfile = "/tmp/" + input("请输入输出文件名, 例如xxx.sql：")
         appid = "bdg"
+    #getVouchConfigByMouldID('A258ED9653B118D4C4E82A5515342C49')
     generalSql()

@@ -19,3 +19,8 @@ name = 'zhangsan'
 age = 18
 #  注意这里%之前不能有 逗号
 print('name is %s, age is %d' %(name, age))
+
+'''
+命名tuple，可以看做是不可变更的对象
+'''
+import collections
