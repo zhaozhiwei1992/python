@@ -34,7 +34,7 @@ import os
 # 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # 连接数据库
-con = cx_Oracle.connect('fasp_test/1@192.168.3.41/orcl')
+con = cx_Oracle.connect('pay_34/1@127.0.0.1/helowin')
 
 # 查询模板信息 对每个模板下的所有配置信息进行查询
 #
@@ -111,6 +111,7 @@ def getPabusinessmouldconfig(mouldid):
 
 
 def getPageconsoleByURL(url):
+    global sqls
     dicts = getRecordSet('bus_t_pageconsole', 'url', url)
     for map in dicts:
         sqls = createInsertAndDelSQL('bus_t_pageconsole', 'url', map)
@@ -369,10 +370,10 @@ if __name__ == "__main__":
     cur.execute("SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM('','87','2016','') FROM DUAL")
     # 获取界面配置信息
     # getPabusinessmouldByAppid('bdg')
-    # getPabusinessmould('50BA23DJCKDNCK63BJDKCJ39A6A05186')
+    getPabusinessmould('50BA2350F9AD4563BJDKnkjjjkn05186')
 
     # 获取表注册信息
-    getdictableAndColumnsByAppid("bdg")
+    # getdictableAndColumnsByAppid("bdg")
     # sqls = getdictableAndColumns('BDG_T_BDGRECEIVEDATA')
     # for sql in sqls:
     #     print(sql)
