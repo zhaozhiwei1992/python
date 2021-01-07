@@ -1,0 +1,7 @@
+>>> from frenchDeck import FrenchDeck
+>>> from frenchDeck import Card
+>>> f = FrenchDeck()
+>>> len(f) 
+52
+>>> Card('7', '黑桃') in f
+True
