@@ -1,9 +1,9 @@
 import urllib.request
 import requests         
-import os.path
 # import ctypes
 import re
 import time
+import os
 
 def save_img(img_url,dirname):
     #保存图片到磁盘文件夹dirname
@@ -47,7 +47,7 @@ def set_img_as_wallpaper(filepath):
     # ctypes.windll.user32.SystemParametersInfoW(20, 0, filepath, 0)
 
 if __name__ == "__main__":
-    dirname = "/home/lx7ly/Pictures/bingImg"       # 图片要被保存在的位置
+    dirname = os.environ['HOME'] + "/Pictures/bingImg"       # 图片要被保存在的位置
     img_url = get_img_url()
     filepath = save_img(img_url, dirname)   # 图片文件的的路径
     # set_img_as_wallpaper(filepath)
