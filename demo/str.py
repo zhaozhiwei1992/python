@@ -1,3 +1,8 @@
+print("{} {}".format("hello", "world"))
+# tuple作为参数不能用format传，否则会出现index溢出
+print("%s %s"%("hello","world"))
+print("insert into standard_field (table_name, code, name, type, length, required) values ('{}', '{}', '{}', '{}', '{}', '{}')".format('ELE_CATALOG', 'ELE_CATALOG_ID', '目录主键', 'String', '38', '1'))
+
 str="|"
 joinstr = str.join(["pig", "dog", "cat"])
 print(joinstr)
