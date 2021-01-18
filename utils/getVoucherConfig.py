@@ -6,6 +6,27 @@ import sys
 # 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 
+# 根据单据获取配置信息
+# -- 单据配置
+# select * from fasp_t_pavoucher t where t.guid = 'vchid' ;
+#
+# -- 配置中间表
+# select * from fasp_t_papage t where t.vchtypeid = 'vchid';
+#
+# -- ui配置细腻
+# select * from busfw_t_uifunction t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
+# select * from busfw_t_uiqueryform t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
+# select * from busfw_t_uitable t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
+# select * from busfw_t_uicolumn t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
+# select * from busfw_t_uitable t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
+# select * from busfw_t_uicolumn t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
+#
+# -- 菜单配置
+# select * from fasp_t_pubmenu t where t.param3 = 'vchid';
+#
+#
+# select * from busfw_T_uitable t where t.key like '/bdg/common/srcto/index';
+# select * from busfw_T_uicolumn t where t.key like '/bdg/common/srcto/index';
 
 # 连接数据库
 
@@ -240,7 +261,8 @@ if __name__ == "__main__":
         wprovince = "4300"
         wyear = "2020"
         # con = cx_Oracle.connect('fasp_4412/1@192.168.3.41/orcl')
-        connstr = "db_readonly/1@192.168.3.73/orcl"
+        # connstr = "db_readonly/1@192.168.3.73/orcl"
+        connstr = cx_Oracle.connect(os.environ['ORACLE_CONNECT'])
         outputfile = "/tmp/config_bdg.sql"
         appid = "bdg"
     else:

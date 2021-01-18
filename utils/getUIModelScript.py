@@ -33,8 +33,8 @@ import os
 
 # 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
-# 连接数据库
-con = cx_Oracle.connect('pay_lhc170119/1@192.168.3.6/orcl')
+# 连接数据库 pay_33_sync/1@192.168.1.5/orcl
+con = cx_Oracle.connect(os.environ['ORACLE_CONNECT'])
 
 # 查询模板信息 对每个模板下的所有配置信息进行查询
 #
@@ -367,10 +367,10 @@ def getdictableAndColumnsByAppid(appid):
 
 
 if __name__ == "__main__":
-    cur.execute("SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM('','1500','2017','') FROM DUAL")
+    cur.execute("SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM('','87','2016','') FROM DUAL")
     # 获取界面配置信息
     # getPabusinessmouldByAppid('bdg')
-    getPabusinessmould('50BA2350F9AD4563BJDKnkjjjkn05186')
+    getPabusinessmould('3B1B7D3CA352A590A38278F1F9719DC5')
 
     # 获取表注册信息
     # getdictableAndColumnsByAppid("bdg")

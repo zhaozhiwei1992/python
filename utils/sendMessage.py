@@ -1,7 +1,8 @@
 import requests
 import time
+import os
 
-tel = '18234837162'
+tel = os.environ['PHONE']
 # 请求数据
 s = 100
 
