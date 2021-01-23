@@ -11,15 +11,22 @@
 # cursum: 1 x: 4 maxsum: 6
 # [53] Maximum Subarray
 #
+
+from typing import List
+
+
 class Solution:
     def maxSubArray(self, nums: List[int]) -> int:
         if not nums:
-            return 0        
+            return 0
         cursum = maxsum = nums[0]
-        #  邱所有书和最大, 每次尽量最大, 当前的最大不一定最大，还要与上一次的比较
+        #  求所有数和最大, 每次尽量最大, 当前的最大不一定最大，还要与上一次的比较
         for x in nums[1:]:
             # print("cursum: " + str(cursum) + " x: " + str(x) + " maxsum: " + str(maxsum))
-            cursum = max(x, x+cursum)
+            cursum = max(x, x + cursum)
             maxsum = max(maxsum, cursum)
         return maxsum
 
+
+if __name__ == '__main__':
+    print(Solution().maxSubArray([1, 2, 3, 9, 6]))

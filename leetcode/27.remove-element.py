@@ -3,6 +3,7 @@
 #
 # [27] Remove Element
 #
+from typing import List
 class Solution:
     def removeElement(self, nums: List[int], val: int) -> int:
         # 方法1   67.88%  5.09%

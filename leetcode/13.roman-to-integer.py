@@ -79,28 +79,30 @@
 #
 class Solution:
     def romanToInt(self, s: str) -> int:
-        #  如果后面数字小 就直接加, 如果后面数字大就加后面数并且减当前数x2
+        # 算法:  如果后面数字小 就直接加, 如果后面数字大就加后面数并且减当前数x2
         # MCMXCIV = 1000+100+1000-100x2 + 10 + 100 - 20 + 1 + 5 - 1*2 = M+C+M-2C+X+C-2X+I+V-2I
-    # 
-    # Symbol       Value
-    # I             1
-    # V             5
-    # X             10
-    # L             50
-    # C             100
-    # D             500
-    # M             1000
-        dict={"I":1,"V":5,"X":10,"L":50,"C":100,"D":500,"M":1000}
-        num=0
-        pre=""
+        #
+        # Symbol       Value
+        # I             1
+        # V             5
+        # X             10
+        # L             50
+        # C             100
+        # D             500
+        # M             1000
+        dict = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+        num = 0
+        pre = ""
         for i in list(s):
             if pre != "" and dict.get(pre) < dict.get(i):
                 # num += (dict.get(i) - dict.get(pre) * 2)
                 # 加是必须得，但是只有后面值大才会减
+                # 如果当前数字值大于上次，得减去上次值 x2
                 num -= dict.get(pre) * 2
             num += dict.get(i)
-            pre=i
+            pre = i
         return num
-if __name__ == "__main__":
-    print(Solution().romanToInt("IV"))
 
+
+if __name__ == "__main__":
+    print(Solution().romanToInt("MCMXCIV"))

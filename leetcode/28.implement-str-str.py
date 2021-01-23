@@ -9,3 +9,7 @@ class Solution:
             return 0
         else:
             return haystack.find(needle)
+
+
+if __name__ == "__main__":
+    print(Solution().strStr("abcdef", "e"))

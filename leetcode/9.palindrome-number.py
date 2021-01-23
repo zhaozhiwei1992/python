@@ -46,14 +46,17 @@
 """
 判断数字是否为回文
 1. 小于0的肯定不是
-2. 数字转字符串，到需排列如果相等则是回文
+2. 数字转字符串，倒序排列如果相等则是回文
 """
+
+
 class Solution:
     def isPalindrome(self, x: int) -> bool:
-        if(x < 0):
+        if (x < 0):
             return False
-        return int(str(x)[::-1])==x 
+        return int(str(x)[::-1]) == x
+
 
 if __name__ == "__main__":
     solution = Solution()
-    print("是否回文数: %s"%solution.isPalindrome(121))
+    print("是否回文数: %s" % solution.isPalindrome(121))

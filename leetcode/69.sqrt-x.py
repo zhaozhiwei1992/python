@@ -10,5 +10,8 @@ class Solution(object):
         :rtype: int
         """
         #  参考 https://www.runoob.com/python3/python3-square-root.html
-        return int(x**0.5) 
+        return int(x ** 0.5)
 
+
+if __name__ == '__main__':
+    print(Solution().mySqrt(4))

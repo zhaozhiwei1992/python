@@ -6,6 +6,7 @@
 #
 from typing import List
 
+
 class Solution:
     def removeDuplicates(self, nums: List[int]) -> int:
         # 这个方式不行，要求不能重新创建list并且要改变原有的
@@ -34,15 +35,21 @@ class Solution:
         if not nums:
             return 0
         else:
-            ii,jj=1,1
-            while jj<len(nums):
+            ii, jj = 1, 1
+            while jj < len(nums):
                 print(ii, '---', jj)
-                if nums[ii-1]!=nums[jj]:
-                    # 相邻数字不相等，则后移
+                if nums[ii - 1] != nums[jj]:
+                    # 相邻数字不相等，则指针后移
                     # 如果相等就跳过, 这样也相当于数据丢失
-                    nums[ii]=nums[jj]
-                    ii+=1
-                jj+=1
+                    nums[ii] = nums[jj]
+                    ii += 1
+                jj += 1
+                print(nums)
             return ii
+
+
 if __name__ == "__main__":
-    print("去重后结果", Solution().removeDuplicates([1,2,3]))
+    print("去重后结果", Solution().removeDuplicates([1, 1, 2, 3]))
+    #  nums[0] : 1 === number[1]: 1 --> jj ++   1, 1, 2, 3
+    #  nums[1]: 1 != nums[2]: 2 --> nums[1] = 2    1,2,2,3
+    # nums[2]: 2 != nums[3]: 3 -->  nums[2] = 3   1, 2, 3, 3

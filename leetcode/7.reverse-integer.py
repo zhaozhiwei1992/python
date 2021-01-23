@@ -42,6 +42,9 @@
 # 
 #
 class Solution:
+    #  将数字绝对值转换为字符串，
+    # 字符串反转并转换为数字,
+    #  然后增加符号返回
     def reverse(self, x: int) -> int:
         maxint = 2<<30
         minint = -2<<30
