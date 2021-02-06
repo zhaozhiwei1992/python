@@ -76,6 +76,7 @@ def getOptFunc():
 def argparseFunc():
     """
     基于argparse模块实现高级的参数解析功能
+    default 默认值
     执行示例：
          python use_params.py -i 172.19.7.236 -p 7077 -f -w
          python use_params.py -i 172.19.7.236 -p 7077 -f -r
@@ -93,7 +94,7 @@ optional arguments:
 
     """
     parser = argparse.ArgumentParser(description="show example")  # 使用argparse的构造函数来创建对象
-    parser.add_argument("-i", "--ip", help="IP Address")  # 添加可解析的参数
+    parser.add_argument("-i", "--ip", default="127.0.0.1", help="IP Address")  # 添加可解析的参数
     parser.add_argument("-p", "--port", help="IP Port")  # 添加可解析的参数
     parser.add_argument("-f", "--flag", help="Flag", action="store_true")  # action=store_true的意义是如果使用了这个参数则值默认为TRUE
     exptypegroup = parser.add_mutually_exclusive_group()  # 添加一组互斥的选项，如上例中的-l和-r只能用一个
