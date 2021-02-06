@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import argparse
 
 import cx_Oracle
 import json
@@ -279,6 +280,7 @@ def getPabusinessmould(guid):
             # 写入到文件
             # whiletoFile(sqls)
 
+
 # 获取模板信息
 def getPabusinessmouldByAppid(appid):
     dicts = getRecordSet('fasp_t_pabusinessmould', 'appid', appid)
@@ -349,6 +351,7 @@ def getPageconsolecomconfigByJSON(jsonstr):
     delsql.extend(sqls)
     return delsql
 
+
 # 根据系统标识获取注册表
 def getdictableAndColumnsByAppid(appid):
     dicts = getRecordSet('fasp_t_dictable', 'appid', appid)
@@ -366,11 +369,32 @@ def getdictableAndColumnsByAppid(appid):
             # whiletoFile(sqls)
 
 
+def argparseFunc():
+    """
+    基于argparse模块实现高级的参数解析功能
+    执行示例：
+         python getVoucherConfig.py --rprovince=1500  --ryear=2017 -c fasp_4412/1@192.168.3.41/orcl
+         python getVoucherConfig.py -h
+
+    """
+    parser = argparse.ArgumentParser(description="show example")  # 使用argparse的构造函数来创建对象
+    parser.add_argument("-c", "--connstr", help="请输入数据库用户名密码, 例如:fasp_4412/1@192.168.3.41/orcl:")
+    parser.add_argument("-o", "--outputfile", help="写出文件路径, 默认/tmp下")
+    parser.add_argument("-a", "--appid", default="bdg", help="系统标识, 默认bdg")
+    parser.add_argument("-m", "--mouldid", help="模板id")
+    ARGS = parser.parse_args()
+    print('ARGS:', ARGS)
+    return ARGS
+
+
 if __name__ == "__main__":
     cur.execute("SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM('','87','2016','') FROM DUAL")
     # 获取界面配置信息
-    # getPabusinessmouldByAppid('bdg')
-    getPabusinessmould('3B1B7D3CA352A590A38278F1F9719DC5')
+    ARGS = argparseFunc()
+    if ARGS.mouldid is not None:
+        getPabusinessmould(ARGS.mouldid)
+    elif ARGS.appid is not None:
+        getPabusinessmouldByAppid(ARGS.appid)
 
     # 获取表注册信息
     # getdictableAndColumnsByAppid("bdg")
@@ -378,17 +402,17 @@ if __name__ == "__main__":
     # for sql in sqls:
     #     print(sql)
 
-        # f = open('/home/lx7ly/Documents/PAY_T_PAYSUBdic_zzw.sql', 'w')  # r只读，w可写，a追加
-        # for sql in sqls:
-        #     f.write(sql + '\n')
+    # f = open('/home/lx7ly/Documents/PAY_T_PAYSUBdic_zzw.sql', 'w')  # r只读，w可写，a追加
+    # for sql in sqls:
+    #     f.write(sql + '\n')
 
-        # con.close()
+    # con.close()
 
-        # annotation  todo pageconsolecomconfig jiexi
-        # sqls = []
-        # sqls.extend(getUIFunction('{"key":"/bdg/generaladd/summaryQuery",name:"按钮区",className:"busleftbtn"}'))
-        # sqls.extend(getUIeditform('{"key":"/bdg/generaladd/summaryQuery",name:"编辑区",title:"编辑区"}'))
-        # sqls.extend(getUIDatatable('{"tablecode":"FASP_T_GLCTRL","key":"/bdg/generaladd/summaryQuery",name:"追减指标",edit:true,edittableselect:true,checkbox:true,title:"追减指标", addrow:"false"}'))
-        # sqls.extend(getUIDatacolumns('{"tablecode":"FASP_T_GLCTRL","key":"/bdg/generaladd/summaryQuery",name:"追减指标",edit:true,edittableselect:true,checkbox:true,title:"追减指标", addrow:"false"}'))
-        # for sql in sqls:
-        #     print(sql)
+    # annotation  todo pageconsolecomconfig jiexi
+    # sqls = []
+    # sqls.extend(getUIFunction('{"key":"/bdg/generaladd/summaryQuery",name:"按钮区",className:"busleftbtn"}'))
+    # sqls.extend(getUIeditform('{"key":"/bdg/generaladd/summaryQuery",name:"编辑区",title:"编辑区"}'))
+    # sqls.extend(getUIDatatable('{"tablecode":"FASP_T_GLCTRL","key":"/bdg/generaladd/summaryQuery",name:"追减指标",edit:true,edittableselect:true,checkbox:true,title:"追减指标", addrow:"false"}'))
+    # sqls.extend(getUIDatacolumns('{"tablecode":"FASP_T_GLCTRL","key":"/bdg/generaladd/summaryQuery",name:"追减指标",edit:true,edittableselect:true,checkbox:true,title:"追减指标", addrow:"false"}'))
+    # for sql in sqls:
+    #     print(sql)
