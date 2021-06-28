@@ -17,11 +17,11 @@ os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # -- 配置中间表
 # select * from fasp_t_papage t where t.vchtypeid = 'vchid';
 #
-# -- ui配置细腻
+# -- ui配置信息
 # select * from busfw_t_uifunction t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
 # select * from busfw_t_uiqueryform t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
-# select * from busfw_t_uitable t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
-# select * from busfw_t_uicolumn t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
+# select * from busfw_t_uitabpage t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
+# select * from busfw_t_uieditform t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
 # select * from busfw_t_uitable t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
 # select * from busfw_t_uicolumn t where t.key in (select t.uikey from P#fasp_t_papage t where t.vchtypeid = 'vchid');
 #

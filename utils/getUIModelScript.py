@@ -390,11 +390,13 @@ def argparseFunc():
 if __name__ == "__main__":
     cur.execute("SELECT GLOBAL_MULTYEAR_CZ.SECU_F_GLOBAL_SETPARM('','87','2016','') FROM DUAL")
     # 获取界面配置信息
-    ARGS = argparseFunc()
-    if ARGS.mouldid is not None:
-        getPabusinessmould(ARGS.mouldid)
-    elif ARGS.appid is not None:
-        getPabusinessmouldByAppid(ARGS.appid)
+    # ARGS = argparseFunc()
+    # if ARGS.mouldid is not None:
+    #     getPabusinessmould(ARGS.mouldid)
+    # elif ARGS.appid is not None:
+    #     getPabusinessmouldByAppid(ARGS.appid)
+
+    getPabusinessmould('688A2466EBA83DF4D0A0A6C198EC1DAE')
 
     # 获取表注册信息
     # getdictableAndColumnsByAppid("bdg")
@@ -402,7 +404,7 @@ if __name__ == "__main__":
     # for sql in sqls:
     #     print(sql)
 
-    # f = open('/home/lx7ly/Documents/PAY_T_PAYSUBdic_zzw.sql', 'w')  # r只读，w可写，a追加
+    # f = open('/home/zhaozhiwei/Documents/PAY_T_PAYSUBdic_zzw.sql', 'w')  # r只读，w可写，a追加
     # for sql in sqls:
     #     f.write(sql + '\n')
 

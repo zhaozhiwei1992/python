@@ -14,7 +14,7 @@ import datetime
 # print(questtionDatas.allData)
 
 print('Opening workbook...')
-wb = openpyxl.load_workbook('/home/lx7ly/workspace/python/utils/惠民系统问题及需求更新（含用例）(1).xlsx')
+wb = openpyxl.load_workbook('/home/zhaozhiwei/workspace/python/utils/惠民系统问题及需求更新（含用例）(1).xlsx')
 print("所有sheet", wb.sheetnames)
 # 获取sheet
 sheet = wb.get_sheet_by_name(wb.sheetnames[2])

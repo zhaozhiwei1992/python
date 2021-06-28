@@ -33,17 +33,17 @@ if __name__ == "__main__":
             else:
                 # 查询数据
                 sql = ("select '{\"job\":{\"content\":[{\"reader\":{\"name\":\"oraclereader\","
-                "\"paramketer\":{\"column\":[' ||"
-                "       wm_concat('\"' || t.column_name || '\"') || "
-                "       '],\"connection\":[{\"jdbcUrl\":[\"jdbc:oracle:thin:@//10.40.36.194:1521/jszx\"],"
-                "\"table\":[\"tablename\"]}],\"password\":\"1\",\"username\":\"bdg_33\"}},"
-                "\"writer\":{\"name\":\"postgresqlwriter\",\"parameter\":{\"column\":[' "
-                "       || wm_concat('\"' || t.column_name || '\"') ||"
-                "       '],\"connection\":[{\"jdbcUrl\":\"jdbc:postgresql://10.142.96.168:3433/test_01\","
-                "\"table\":[\"bdg_33.tablename\"]}],\"password\":\"tjhq1234\",\"postSql\":[],\"preSql\":[\"alter "
-                "table bdg_33.fw_t_systemset disable trigger usertotemp493\"],\"username\":\"admin_ts\","
-                "\"writeMOde\":\"update\"}}}],\"setting\":{\"speed\":{\"channel\":\"32\"}}}}' ""from user_tab_cols t "
-                "where t.table_name = :table_name")
+                       "\"paramketer\":{\"column\":[' ||"
+                       "       wm_concat('\"' || t.column_name || '\"') || "
+                       "       '],\"connection\":[{\"jdbcUrl\":[\"jdbc:oracle:thin:@//10.40.36.194:1521/jszx\"],"
+                       "\"table\":[\"tablename\"]}],\"password\":\"1\",\"username\":\"bdg_33\"}},"
+                       "\"writer\":{\"name\":\"postgresqlwriter\",\"parameter\":{\"column\":[' "
+                       "       || wm_concat('\"' || t.column_name || '\"') ||"
+                       "       '],\"connection\":[{\"jdbcUrl\":\"jdbc:postgresql://10.142.96.168:3433/test_01\","
+                       "\"table\":[\"bdg_33.tablename\"]}],\"password\":\"tjhq1234\",\"postSql\":[],\"preSql\":[\"alter "
+                       "table bdg_33.fw_t_systemset disable trigger usertotemp493\"],\"username\":\"admin_ts\","
+                       "\"writeMOde\":\"update\"}}}],\"setting\":{\"speed\":{\"channel\":\"32\"}}}}' ""from user_tab_cols t "
+                       "where t.table_name = :table_name")
 
                 cur.prepare(sql)
                 cur.execute(None, {'table_name': line.upper()})
@@ -52,8 +52,8 @@ if __name__ == "__main__":
                 # json格式化
                 for result in res:
                     # 写入到json文件
-                    f = open('/tmp/'+line+'.json', 'w')  # r只读，w可写，a追加
-                    jsonStr=json.loads(str(result[0]))
+                    f = open('/tmp/' + line + '.json', 'w')  # r只读，w可写，a追加
+                    jsonStr = json.loads(str(result[0]))
                     formatJson = json.dumps(jsonStr, indent=1)
                     f.write(formatJson + '\n')
     finally:
