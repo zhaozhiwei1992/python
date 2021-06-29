@@ -25,39 +25,9 @@ def create_app(test_config=None):
     # a simple page that says hello
     @app.route('/health')
     def health():
-        return 'It is ok!'
+        return 'status up!'
 
-    from server.database import get_db
-
-    @app.route('/add')
-    def addUser():
-        conn = get_db()
-        c = conn.cursor()
-        print("Opened database successfully")
-
-        # 业务逻辑
-        c.execute("INSERT INTO user (ID,USERNAME,password) \
-              VALUES (1, 'Paul', '12321' )")
-
-        conn.commit()
-        print("Records created successfully")
-        conn.close()
-        return 'add success'
-
-    @app.route('/get')
-    def getUser():
-        conn = get_db()
-        c = conn.cursor()
-        print("Opened database successfully")
-
-        # 业务逻辑
-        cursor = c.execute("SELECT id, username, password  from user")
-        for row in cursor:
-            print(row[1])
-            print(row["password"])
-
-        print("Records created successfully")
-        conn.close()
-        return 'get success'
+    from app.UserResource import constract_app
+    constract_app(app)
 
     return app
