@@ -35,7 +35,8 @@ import os
 # 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # 连接数据库 pay_33_sync/1@192.168.1.5/orcl
-con = cx_Oracle.connect(os.environ['ORACLE_CONNECT'])
+con = cx_Oracle.connect('bdg_330000/bdg330000@192.168.36.166/orcl')
+# con = cx_Oracle.connect('pay_33_sync/1@192.168.7.6/orcl')
 
 # 查询模板信息 对每个模板下的所有配置信息进行查询
 #
@@ -56,27 +57,32 @@ def getColumnByTablecode(tablecode):
 # 创建删除语句
 def createDelSql(tablecode, code, map):
     sqls = []
-    sql = "delete from " + tablecode + " t where t." + code + " = '" + map[code] + "';"
+    sql = "delete from p#" + tablecode + " t where t." + code + " = '" + map[code] + "';"
     sqls.append(sql)
     return sqls
 
 
 # 创建插入语句
+# 增加区划年度
 def createInsertSql(tablecode, map):
     sqls = []
     sql = "insert into " + tablecode + "("
     for result in map.keys():
-        if result.lower() == 'province' or result.lower() == 'year':
-            continue
+        # if result.lower() == 'province' or result.lower() == 'year':
+        #     continue
         sql += result
         sql += ","
     sql = sql[0: len(sql) - 1]
     sql += ") values ("
     for result in map.keys():
-        if result.lower() == 'province' or result.lower() == 'year':
-            continue
+        # if result.lower() == 'province' or result.lower() == 'year':
+        #     continue
         string = map[result.lower()]
-        if (result.upper() == "GUID" or result.upper() == "COLUMNID") and (
+        if result.lower() == 'province':
+            sql += '87'
+        elif result.lower() == 'year':
+            sql += '2016'
+        elif (result.upper() == "GUID" or result.upper() == "COLUMNID") and (
                 tablecode.lower() != "fasp_t_pabusinessmould" and tablecode.lower() != "fasp_t_pabusinessmodelmenu"):
             sql += 'sys_guid()'
         elif string is None:
@@ -396,13 +402,13 @@ if __name__ == "__main__":
     # elif ARGS.appid is not None:
     #     getPabusinessmouldByAppid(ARGS.appid)
 
-    getPabusinessmould('688A2466EBA83DF4D0A0A6C198EC1DAE')
+    # getPabusinessmould('437A05D24863A1E540612AA5NCKD7HNV')
 
     # 获取表注册信息
     # getdictableAndColumnsByAppid("bdg")
-    # sqls = getdictableAndColumns('BDG_T_BDGRECEIVEDATA')
-    # for sql in sqls:
-    #     print(sql)
+    sqls = getdictableAndColumns('PAY_APPLY_CORRECTIONMAIN')
+    for sql in sqls:
+        print(sql)
 
     # f = open('/home/zhaozhiwei/Documents/PAY_T_PAYSUBdic_zzw.sql', 'w')  # r只读，w可写，a追加
     # for sql in sqls:

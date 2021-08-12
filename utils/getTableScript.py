@@ -19,7 +19,8 @@ def droptable(tablename, viewname):
     sqlList.append("(")
 
     #字段信息
-    con = cx_Oracle.connect('pay_lhc170119/1@192.168.3.6/orcl')
+    con = cx_Oracle.connect('pay_33_sync/1@192.168.7.6/orcl')
+    # con = cx_Oracle.connect('bdg_330000/bdg330000@192.168.36.166/orcl')
     cur = con.cursor()
     sql = "select t.* from user_tab_columns t where t.table_name = :table_name"
     cur.prepare(sql)
@@ -32,14 +33,14 @@ def droptable(tablename, viewname):
         columnType = result[2]
         if index == 0:
             if columnType == 'NUMBER':
-                sqlList.append(columnName + " " + columnType + "(" + str(result[6]) + "," + str(result[7]) + ")")
+                sqlList.append(columnName + " " + columnType + " " + str(result[6]) + "," + str(result[7]) + " ")
             else:
-                sqlList.append(columnName + " " + columnType + "(" + str(result[5]) + ")")
+                sqlList.append(columnName + " " + columnType + " " + str(result[5]) + " ")
         else:
             if columnType == 'NUMBER':
-                sqlList.append(columnName + " " + columnType + "(" + str(result[6]) + "," + str(result[7]) + "),")
+                sqlList.append(columnName + " " + columnType + " " + str(result[6]) + "," + str(result[7]) + " ,")
             else:
-                sqlList.append(columnName + " " + columnType + "(" + str(result[5]) + "),")
+                sqlList.append(columnName + " " + columnType + " " + str(result[5]) + " ,")
     # print(len(sqlList))
     sqlList.append(")")
     sqlList.append("partition by list (PROVINCE)")
@@ -73,8 +74,8 @@ def droptable(tablename, viewname):
 
 if __name__ == '__main__':
     # tablecode
-    tablename = 'P#PAY_T_PAYSUB'
+    tablename = 'PAY_APPLY_CORRECTION'
     # viewname
-    viewname = 'PAY_T_PAYSUB'
+    viewname = 'V_PAY_APPLY_CORRECTION'
     print(droptable(tablename, viewname))
 
