@@ -28,38 +28,54 @@ class AppDynamicsJob(unittest.TestCase):
         driver.find_element_by_id("userpwd").send_keys("LT1336")
         driver.find_element_by_id("bLogin").click()
 
-        # 操作费用报销
+        time.sleep(1)  # sleep for 1 sec
+        # 操作 工时填报, 定位是费用报销 日..
         driver.find_element_by_xpath(
             u"(.//*[normalize-space(text()) and normalize-space(.)='费用报销'])[1]/following::*[name()='svg'][1]").click()
-        driver.find_element_by_id("button-1237-btnIconEl").click()
-        driver.find_element_by_xpath("//td[@id='ext-gen2638']/div").click()
-        driver.find_element_by_id("ext-gen1019").click()
-        driver.find_element_by_xpath("//td[@id='ext-gen3396']/div").click()
-        driver.find_element_by_id("multifield-1424-inputEl").clear()
-        driver.find_element_by_id("multifield-1424-inputEl").send_keys("8")
-        driver.find_element_by_xpath("//td[@id='ext-gen3397']/div").click()
-        # ERROR: Caught exception [ERROR: Unsupported command [doubleClick | id=multifield-1428-inputEl | ]]
-        driver.find_element_by_id("multifield-1428-inputEl").clear()
-        driver.find_element_by_id("multifield-1428-inputEl").send_keys("8")
-        driver.find_element_by_xpath("//td[@id='ext-gen3589']/div").click()
-        # ERROR: Caught exception [ERROR: Unsupported command [doubleClick | id=multifield-1432-inputEl | ]]
-        driver.find_element_by_id("multifield-1432-inputEl").clear()
-        driver.find_element_by_id("multifield-1432-inputEl").send_keys("8")
-        driver.find_element_by_xpath("//td[@id='ext-gen3781']/div").click()
-        # ERROR: Caught exception [ERROR: Unsupported command [doubleClick | id=multifield-1436-inputEl | ]]
-        driver.find_element_by_id("multifield-1436-inputEl").clear()
-        driver.find_element_by_id("multifield-1436-inputEl").send_keys("8")
-        driver.find_element_by_xpath("//td[@id='ext-gen3973']/div").click()
-        # ERROR: Caught exception [ERROR: Unsupported command [doubleClick | id=multifield-1440-inputEl | ]]
-        driver.find_element_by_id("multifield-1440-inputEl").clear()
-        driver.find_element_by_id("multifield-1440-inputEl").send_keys("8")
-        driver.find_element_by_xpath("//td[@id='ext-gen4165']/div").click()
-        # ERROR: Caught exception [ERROR: Unsupported command [doubleClick | id=multifield-1444-inputEl | ]]
-        driver.find_element_by_id("multifield-1444-inputEl").clear()
-        driver.find_element_by_id("multifield-1444-inputEl").send_keys("8")
-        driver.find_element_by_id("gridview-1305").click()
-        driver.find_element_by_id("button-1344-btnIconEl").click()
-        driver.find_element_by_id("tool-1351-toolEl").click()
+
+        time.sleep(1)  # sleep for 1 sec
+        # 新建
+        driver.find_element_by_id("button-1028-btnIconEl").click()
+
+        # 录入表单, 13列 第一行
+        # document.getElementsByClassName('x-grid-row x-grid-row-selected x-grid-data-row x-grid-row-focused')[1].childNodes
+        # 每一个td里, 第一个div的text设置值即可
+        # todo 遍历节点赋值
+        # 1. 如何遍历节点
+        # 2. 如何找子节点 by_xpath
+        tr = driver.find_element_by_xpath('//*[@id="gridview-1097-record-ext-record-1426"]')
+        tds = tr.find_elements_by_tag_name('td')
+        for index, td in enumerate(tds):
+            print(index, td)
+            div = td.find_element_by_tag_name('div')
+            # 录五天比较保险, 直接给div设置参数不可行, 还是需要点击，录入模拟操作
+            if(index == 1):
+                # driver.find_element_by_xpath("//td[@id='ext-gen1991']/div").click()
+                # driver.find_element_by_xpath("//td[@id='ext-gen2118']/div").click()
+                # todo 需要模拟点击
+                driver.execute_script("arguments[0].innerHTML = '[RX202010058-TF202012474]浙江省数字财政管理中心金财2.0业务中台适配改造及实施项目';", div)
+            elif(index == 2):
+                driver.execute_script("arguments[0].innerHTML = '[WBS-KF]财政研发中心';", div)
+            elif(index == 3):
+                driver.execute_script("arguments[0].innerHTML = '[KF-SX]开发与测试任务';", div)
+            if(index > 5 and index < 11):
+                # arguments[0]对应的是第一个参数，可以理解为python里的%s传参，与之类似
+                # driver.execute_script("arguments[0].innerHTML = '8';", div)
+               div.click()
+               # div.find_element_by_tag_name('input').clear()
+               # div.find_element_by_tag_name('input').send_keys("8")
+               # //*[@id="multifield-1218-inputEl"]
+               #  属性找的不够准确, 根据显示的ext-comp, display <> none的,里边找input
+               driver.find_element_by_xpath("//input[contains(@id,'-inputEl')]").clear()
+               driver.find_element_by_xpath("//input[contains(@id,'-inputEl')]").send_keys("8")
+               # driver.find_element_by_id("multifield-.*-inputEl").clear()
+               # driver.find_element_by_id("multifield-.*-inputEl").send_keys("8")
+
+        # todo 退处界面
+        # todo 退出登录
+        # driver.find_element_by_id("gridview-1305").click()
+        # driver.find_element_by_id("button-1344-btnIconEl").click()
+        # driver.find_element_by_id("tool-1351-toolEl").click()
 
     def is_element_present(self, how, what):
         try:
