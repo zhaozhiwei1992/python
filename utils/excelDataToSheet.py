@@ -14,35 +14,25 @@ from itertools import groupby
 import openpyxl
 from openpyxl import Workbook
 
-def getColsInfoFromExcel():
+
+def getColsInfoFromExcel(cols):
     tableinfos = []
     print('Opening workbook...')
     wb = openpyxl.load_workbook('/mnt/d/vagrant/win7/指标下达.xlsx')
     print("所有sheet", wb.sheetnames)
     # 获取sheet
-    sheet = wb.get_sheet_by_name(wb.sheetnames[0])
+    # sheet = wb.get_sheet_by_name(wb.sheetnames[0])
+    sheet = wb[wb.sheetnames[0]]
     # Fill in countyData with each county's population and tracts.
     print('Reading rows...')
-    for row in range(2, len(tuple(sheet.rows))):
+    # 从第一行开始，第一行一般为标题行
+    for row in range(1, len(tuple(sheet.rows))):
         # Each row in the spreadsheet has data for one census tract.
-        # A区划编码
-        # B区划名称
-        # C省级文号
-        # D省级项目
-        # E下达金额
-        # F预算形式
-        # G转移支付功能科目
-        # H支出功能科目
-        # 从B开始
+        # 从B开始, 第一行数据为标题, 保留每行信息
         # sheet['I' + str(row)].value
         tableInfo = {}
-        tableInfo['B'] = sheet['B' + str(row)].value
-        tableInfo['C'] = sheet['C' + str(row)].value
-        tableInfo['D'] = sheet['D' + str(row)].value
-        tableInfo['E'] = sheet['E' + str(row)].value
-        tableInfo['F'] = sheet['F' + str(row)].value
-        tableInfo['G'] = sheet['G' + str(row)].value
-        tableInfo['H'] = sheet['H' + str(row)].value
+        for v in cols:
+            tableInfo[v] = sheet[v + str(row)].value
         tableinfos.append(tableInfo)
     return tableinfos
 
@@ -55,29 +45,36 @@ def createExcel(datas):
     wb = Workbook()
     wb.active
 
+    titleInfo = {}
+    titleFlag = True
     for key, group in datas:
         #  创建标签
-        ws1 = wb.create_sheet(key)  # 新建sheet,插入到最后(默认)
+        # 新建sheet,插入到最后(默认), 标题列不能创建, 默认为第一行
+        # data为分组信息
+        if titleFlag:
+            titleFlag = False
+            for g in group:
+                titleInfo = g
+            pass
+        else:
+            ws1 = wb.create_sheet(key)
+            # 创建表头
+            for index, v in enumerate(titleInfo):
+                ws1.cell(1, index + 1, titleInfo.get(v))
 
-        #  字段名 字段中文名 类型 长度 是否可为空 默认值 备注
-        # 创建表头
-        ws1.cell(1, 1, "省级文号")
-        ws1.cell(1, 2, "省级项目 ")
-        ws1.cell(1, 3, "下达金额")
-        ws1.cell(1, 4, "预算形式")
-        ws1.cell(1, 5, "转移支付功能科目")
-        ws1.cell(1, 6, "支出功能科目")
         #  填入数据
         i = 1
+        # row, map list [{}, {}...]
         for g in group:
             count = 0
-            i = i + 1
+            i += 1
+            # cols  {"B":"B_value", "C":"C_value", ...}
             for (k, v) in g.items():
-                # 分组信息信息直接丢弃
-                if k == 'B':
-                    continue
+                # 分组列信息直接丢弃, 只保留后边的
+                # if k == 'B':
+                #     continue
                 count += 1
-                # 地一个跳过
+                # 第一个跳过
                 # print "dict[%s]=" % k,v 
                 ws1.cell(i, count, v)
 
@@ -86,11 +83,13 @@ def createExcel(datas):
 
 
 if __name__ == '__main__':
-    infos = getColsInfoFromExcel()
-    # pprint(infos)
-    print(infos)
 
-    # 数据根据指定列 B 分组
-    infosGroupByTableName = groupby(infos, itemgetter('B'))
+    # 列标集合
+    cols = ['B', 'C', 'D', 'E', 'F', 'G', 'H']
+    infos = getColsInfoFromExcel(cols)
+    # print(infos)
+
+    # 数据根据第一列分组
+    infosGroupByTableName = groupby(infos, itemgetter(cols[0]))
 
     createExcel(infosGroupByTableName)
