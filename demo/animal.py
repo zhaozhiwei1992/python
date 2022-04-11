@@ -10,28 +10,34 @@
 @Desc    :   None
 '''
 
+
 # here put the import lib
 
 class Animal:
     def __init__(self, name, age):
         self.name = name
         self.age = age
+
     def toString(self):
-        print('%s name is %s age is %d'%(self, self.name, self.age))
+        print('%s name is %s age is %d' % (self, self.name, self.age))
+
 
 class Dog(Animal):
     ''' dog class'''
+
     def __init__(self, name, age, skr):
         Animal.__init__(self, name, age)
         self.skr = skr
 
+
 class Pig(Animal):
     def toString(self):
-        print('%s name is %s age is %d'%(self, self.name, self.age))
+        print('%s name is %s age is %d' % (self, self.name, self.age))
+
 
 if __name__ == "__main__":
     dog = Dog('bb', 3, 'eat')
     dog.toString()
 
-    pig = Pig('pp',6)
+    pig = Pig('pp', 6)
     pig.toString()
