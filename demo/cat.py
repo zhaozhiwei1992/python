@@ -23,15 +23,17 @@ cat --help 输出帮助信息
 测试: python cat.py cat.py 输出cat.py中内容
 '''
 
+
 def readFile(name):
     if os.path.exists(name):
         f = open(name, 'r+')
-        while(True):
+        while (True):
             line = f.readline()
-            if(len(line) == 0):
+            if (len(line) == 0):
                 break
             else:
                 print(line)
+
 
 if __name__ == "__main__":
 

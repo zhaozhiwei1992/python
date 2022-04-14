@@ -1,7 +1,9 @@
 from twilio.rest import Client
+
+
 # 使用Twilio的免费手机号发送短信
 # 你需要在官网上申请一个账号，这里是官网：https://www.twilio.com/
-def send_sms(msg='你好，这是来自你自己的手机测试信息！', 		my_number="+3l162"):
+def send_sms(msg='你好，这是来自你自己的手机测试信息！', my_number="+3l162"):
     # 从官网获得以下信息
     account_sid = 'AC8ef6cdxxxx9873bcad3045a'
     auth_token = '009d3c36xxxxxxbdf73f93'
@@ -14,6 +16,7 @@ def send_sms(msg='你好，这是来自你自己的手机测试信息！', 		my_
     except ConnectionError as e:
         print('发送失败，请检查你的账号是否有效或网络是否良好！')
         return e
+
 
 if __name__ == '__main__':
     send_sms()

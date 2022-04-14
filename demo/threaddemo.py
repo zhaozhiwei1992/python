@@ -2,14 +2,13 @@
 # -*- coding: UTF-8 -*-
  
 import _thread as thread
-import time
 import datetime
+import random
+import time
 
 import requests
-import json
 
-import random
- 
+
 def GET(url):
     #get请求
     req = requests.get(url)

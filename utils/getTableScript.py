@@ -1,4 +1,6 @@
 import cx_Oracle
+
+
 def droptable(tablename, viewname):
     tablename = tablename.upper()
     viewname = viewname.upper()
@@ -8,7 +10,8 @@ def droptable(tablename, viewname):
     sqlList.append("begin")
     sqlList.append("select count(1) into num from user_constraints t where t.table_name = '" + tablename + "';")
     sqlList.append("if num > 0 then")
-    sqlList.append("execute immediate 'alter table " + tablename + " drop constraint PK_" + viewname + " cascade drop index';")
+    sqlList.append(
+        "execute immediate 'alter table " + tablename + " drop constraint PK_" + viewname + " cascade drop index';")
     sqlList.append("end if;")
     sqlList.append("select count(1) into num from user_tables where TABLE_NAME = '" + tablename + "';")
     sqlList.append("if   num=1   then")
@@ -18,7 +21,7 @@ def droptable(tablename, viewname):
     sqlList.append("create table " + tablename)
     sqlList.append("(")
 
-    #字段信息
+    # 字段信息
     con = cx_Oracle.connect('pay_33_sync/1@192.168.7.6/orcl')
     # con = cx_Oracle.connect('bdg_330000/bdg330000@192.168.36.166/orcl')
     cur = con.cursor()
@@ -68,9 +71,11 @@ def droptable(tablename, viewname):
 
     sqlList.append("execute immediate'")
     sqlList.append("create or replace view " + viewname + " as")
-    sqlList.append("select * from " + tablename + " t  where year= global_multyear_cz.Secu_f_GLOBAL_PARM(''YEAR'') and province = global_multyear_cz.Secu_f_GLOBAL_PARM(''DIVID'')';")
+    sqlList.append(
+        "select * from " + tablename + " t  where year= global_multyear_cz.Secu_f_GLOBAL_PARM(''YEAR'') and province = global_multyear_cz.Secu_f_GLOBAL_PARM(''DIVID'')';")
     sqlList.append("end;")
     return "\r\n".join(sqlList)
+
 
 if __name__ == '__main__':
     # tablecode
@@ -78,4 +83,3 @@ if __name__ == '__main__':
     # viewname
     viewname = 'V_PAY_APPLY_CORRECTION'
     print(droptable(tablename, viewname))
-

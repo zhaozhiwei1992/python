@@ -14,14 +14,14 @@
 
 number = 23
 flag = True;
-while(flag):
+while (flag):
     guess = int(input('enter a number'))
     print('guess', guess)
-    if(guess > number):
+    if (guess > number):
         print('输入大于', number)
-    elif(guess < number):
+    elif (guess < number):
         print('输入小于', number)
     else:
         print('相等, stop')
         flag = False
-print ('Done')
+print('Done')

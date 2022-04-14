@@ -8,9 +8,9 @@ from email.mime.text import MIMEText
 
 from email.utils import parseaddr, formataddr
 
-def send_email(from_addr, to_addr, subject, password):
 
-    msg = MIMEText("邮件正文",'html','utf-8')
+def send_email(from_addr, to_addr, subject, password):
+    msg = MIMEText("邮件正文", 'html', 'utf-8')
 
     msg['From'] = u'<%s>' % from_addr
 
@@ -28,10 +28,10 @@ def send_email(from_addr, to_addr, subject, password):
 
     smtp.sendmail(from_addr, [to_addr], msg.as_string())
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # 这里的密码是开启smtp服务时输入的客户端登录授权码，并不是邮箱密码
 
     # 现在很多邮箱都需要先开启smtp才能这样发送邮件
 
-    send_email(u"from_addr",u"to_addr",u"主题",u"password")
+    send_email(u"from_addr", u"to_addr", u"主题", u"password")
