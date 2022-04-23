@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-# 文件名：server.py
+# 文件名：socket服务器.py
 
 import socket  # 导入 socket 模块
 

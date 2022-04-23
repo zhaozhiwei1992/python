@@ -13,9 +13,19 @@ request_params = {
 # 设置钉钉 webhook
 webhook_url = "https://oapi.dingtalk.com/robot/send?access_token=088539a54fcebf90c85a6408f71b919cc404bc3570c9fc4a36cc2f12894bb9e4"
 
+
 def get_today_bonds():
     r = requests.get("http://data.hexin.cn/ipo/bond/cate/info/",
                      **request_params)
+    # 如果不传入参数则为今天
+    today = date.today()
+
+    # 今天星期几(星期一 = 1，周日 = 7)
+    week_day = date.weekday(today) + 1
+    is_work_day_in_week = week_day in range(1, 6)
+    # 非工作日不做操作
+    if not is_work_day_in_week:
+        return
 
     textList = []
     for bond in r.json():
@@ -41,6 +51,7 @@ def get_today_bonds():
     # 钉钉里设置了标签为bonds, 必须传
     if len(textList) > 0:
         send_msg("bonds:\n" + "\n".join(textList))
+
 
 # 发送消息
 def send_msg(text):

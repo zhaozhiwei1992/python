@@ -10,8 +10,8 @@ if not os.path.exists("D:\\tmp\\pythontest\\1"):
     os.makedirs("D:\\tmp\\pythontest\\1")
 
 # 判断是否绝对路径是根据路径字符串格式来进行，而不是这个路径是否真实存在
-print(os.path.abspath("."))
-print(os.path.isabs(os.path.abspath(".")))
+print(os.path.abspath(".."))
+print(os.path.isabs(os.path.abspath("..")))
 print(os.path.isabs("/xx"))
 
 # 相对路径: 字符串比较， 路径不一定真实存在

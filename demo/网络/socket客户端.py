@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-# 文件名：client.py
+# 文件名：socket客户端.py
 
 import socket  # 导入 socket 模块
 
