@@ -30,8 +30,8 @@ if __name__ == '__main__':
     version = "V4_0_4_7"
 
     # 读取命令行参数
-    appid = sys.argv[0]
-    version = sys.argv[1]
+    appid = sys.argv[1]
+    version = sys.argv[2]
 
     # 修改产品表示, 版本号, 预计发布日期
     sheet['C3'].value = appid
