@@ -26,7 +26,7 @@ if __name__ == '__main__':
     print("每月周数", monthCount)
 
     # 获取excel
-    wb = openpyxl.load_workbook('/tmp/月周计划模版.xlsx', False)
+    wb = openpyxl.load_workbook('/tmp/月周计划模板.xlsx', False)
     sheet = wb['周计划']
 
     print(sheet.rows)
