@@ -9,6 +9,9 @@ import sys
 每个版本执行一次, 初始化
 
 传入版本参数
+
+python /home/zhaozhiwei/workspace/python/utils/发版计划初始化.py PAYZJ V_$VERSION
+
 """
 if __name__ == '__main__':
     # 获取当前日期

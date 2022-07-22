@@ -19,7 +19,7 @@ os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 
 def getBdgTableInfo():
 
-    tableinfos = [];
+    tableinfos = []
 
     #字段信息
     con = cx_Oracle.connect('pay_lhc170119/1@192.168.3.6/orcl')
