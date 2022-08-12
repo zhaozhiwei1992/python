@@ -379,8 +379,8 @@ def argparseFunc():
     """
     基于argparse模块实现高级的参数解析功能
     执行示例：
-         python getVoucherConfig.py --rprovince=1500  --ryear=2017 -c fasp_4412/1@192.168.3.41/orcl
-         python getVoucherConfig.py -h
+         python 一体化单据配置导出.py --rprovince=1500  --ryear=2017 -c fasp_4412/1@192.168.3.41/orcl
+         python 一体化单据配置导出.py -h
 
     """
     parser = argparse.ArgumentParser(description="show example")  # 使用argparse的构造函数来创建对象

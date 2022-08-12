@@ -123,8 +123,8 @@ if __name__ == '__main__':
 
     # 数据根据table_name分组
     infosGroupByTableName = groupby(infos, itemgetter('table_name'))
-    # for key,group in lstg:
-    #     for g in group: #group是一个迭代器，包含了所有的分组列表
-    #         print (key,g)
+    for key,group in lstg:
+        for g in group: #group是一个迭代器，包含了所有的分组列表
+            print (key,g)
 
-    createExcel(infosGroupByTableName);
+    createExcel(infosGroupByTableName)

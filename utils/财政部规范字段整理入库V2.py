@@ -73,7 +73,6 @@ def getDocDataList194():
 
 
 def saveDataToOracle(tableName, tableColList):
-    global cursor
     # 入库
     ip = '192.168.100.80'
     port = 1521

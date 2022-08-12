@@ -43,7 +43,7 @@ os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 # select * from p#fasp_t_pavoucher t where t.mouldid = '';
 def getVouchConfigByMouldID(mouldid):
     """
-    python getVoucherConfig.py --rprovince=87 --ryear=2016 --wprovince=330000000 --wyear=2021 --connstr=pay_33_sync/1@192.168.1.5/orcl --mouldid=3B1B7D3CA352A590A38278F1F9719DC5
+    python 一体化单据配置导出.py --rprovince=87 --ryear=2016 --wprovince=330000000 --wyear=2021 --connstr=pay_33_sync/1@192.168.1.5/orcl --mouldid=3B1B7D3CA352A590A38278F1F9719DC5
     """
     if ARGS.connstr is None:
         raise Exception("数据库连接信息为空")
@@ -280,8 +280,8 @@ def argparseFunc():
     """
     基于argparse模块实现高级的参数解析功能
     执行示例：
-         python getVoucherConfig.py --rprovince=1500  --ryear=2017 -c fasp_4412/1@192.168.3.41/orcl
-         python getVoucherConfig.py -h
+         python 一体化单据配置导出.py --rprovince=1500  --ryear=2017 -c fasp_4412/1@192.168.3.41/orcl
+         python 一体化单据配置导出.py -h
 
     """
     parser = argparse.ArgumentParser(description="show example")  # 使用argparse的构造函数来创建对象
