@@ -19,7 +19,7 @@ import openpyxl
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'
 
 
-def createTable(tablename, count):
+def createTable(tablename, tableNameCN, count):
     """
     tablename: 要生成脚本的表名
     count: 计数器，为了生成文件编号
@@ -68,11 +68,23 @@ def createTable(tablename, count):
     # 列编码和名称对照
     colCodeNameMap = {}
 
+    # 表注册信息
+    dicColumnsList = []
+    dicColumnsList.append("begin")
+    delSql = "delete from bus_t_dictable  where tablecode = '" + tablename + "';"
+    dicColumnsList.append(delSql)
+    insertSql = "insert into bus_t_Dictable (YEAR, PROVINCE, TABLECODE, NAME, REMARK, TABLETYPE, VERSION, DBTABNAME, " \
+                "APPID, EXP, TABLEPART, ISSHOW, DBIMPFLAG, ISSYS, ISUSES, VIEWTABLENAME, DBVERSION, DATASYNC, " \
+                "HASTRIGGER, SYNCCLASSNAME, STATUS)values ('2016', '87', '" + tablename + "', '" + tableNameCN + "', null, 1, " \
+                                                                                          "4, '" + tablename + "', 'gd', null, '0', 1, null, 1, 1, 'V_" + tablename \
+                + "', null, null, null, null, '1'); "
+    dicColumnsList.append(insertSql)
+
     for result in res:
         index -= 1
         # 0          1        2        3    4      5        6
         # TABLE_NAME COL_CODE COL_NAME TYPE LENGTH REQUIRED MO
-        # ('PAY_NBOND MARKET_RESULT', 'NBOND_MARKET_RESULT_ID', '国债做市支持结果主键', 'String', '38', '是', 'M', None)
+        # ('gd_NBOND MARKET_RESULT', 'NBOND_MARKET_RESULT_ID', '国债做市支持结果主键', 'String', '38', '是', 'M', None)
         columnCode = str(result[1])
         columnName = str(result[2])
         # 存储字段编码对照信息
@@ -90,6 +102,8 @@ def createTable(tablename, count):
                 sqlList.append(columnCode + " number(" + str(result[4]) + ") " + requireStr)
             elif columnType.startswith("Currency"):
                 sqlList.append(columnCode + " number(16, 2) " + requireStr)
+            elif columnType.startswith("Decimal"):
+                sqlList.append(columnCode + " number(16, 6) " + requireStr)
             elif columnType == "DateTime" or columnType == "Datetime" or columnType == "datetime" or columnType == "time":
                 sqlList.append(columnCode + " varchar2(18) " + requireStr)
             elif columnType == "date" or columnType == "Date":
@@ -101,17 +115,25 @@ def createTable(tablename, count):
         else:
             if columnType.startswith("Integer"):
                 # integer类型转number
-                sqlList.append(columnCode + " number(" + str(result[4]) + ") " + requireStr + " ,")
+                sqlList.append(columnCode + " number(" + str(result[4]) + ") " + requireStr + ", ")
             elif columnType.startswith("Currency"):
-                sqlList.append(columnCode + " number(16, 2) " + requireStr + " ,")
+                sqlList.append(columnCode + " number(16, 2) " + requireStr + ", ")
+            elif columnType.startswith("Decimal"):
+                sqlList.append(columnCode + " number(16, 6) " + requireStr + ", ")
             elif columnType == "DateTime" or columnType == "Datetime" or columnType == "datetime" or columnType == "time":
-                sqlList.append(columnCode + " varchar2(18) " + requireStr + " ,")
+                sqlList.append(columnCode + " varchar2(18) " + requireStr + ", ")
             elif columnType == "date" or columnType == "Date":
-                sqlList.append(columnCode + " varchar2(8) " + requireStr + " ,")
+                sqlList.append(columnCode + " varchar2(8) " + requireStr + ", ")
             elif columnType == "Text" or columnType == "Binary":
-                sqlList.append(columnCode + " clob " + requireStr + " ,")
+                sqlList.append(columnCode + " clob " + requireStr + ", ")
             else:
-                sqlList.append(columnCode + " varchar2(" + str(result[4]) + ") " + requireStr + " ,")
+                sqlList.append(columnCode + " varchar2(" + str(result[4]) + ") " + requireStr + ", ")
+
+        # 注册信息生成
+        delAndInsert = dicColumns(tablename, columnCode, columnType, columnName)
+        dicColumnsList.append(delAndInsert[0])
+        dicColumnsList.append(delAndInsert[1])
+
     # print(len(sqlList))
     sqlList.append(")")
     if partationFlag:
@@ -122,7 +144,9 @@ def createTable(tablename, count):
         sqlList.append("(")
         sqlList.append("subpartition P87_Y2016 values (''2016'')")
         sqlList.append(")")
-        sqlList.append(")';")
+        sqlList.append(")")
+
+    sqlList.append("';")
 
     # 主键未定, 单独处理
     # sqlList.append("execute immediate'")
@@ -134,22 +158,26 @@ def createTable(tablename, count):
         sqlList.append(
             "execute immediate 'COMMENT ON COLUMN " + tablename + "." + item[0] + " IS ''" + item[1] + "''';")
 
-    sqlList.append("execute immediate'")
-    sqlList.append("create or replace trigger TR_" + viewname + " before insert or update or delete ON " + tablename)
-    sqlList.append("for each row")
-    sqlList.append("begin")
-    sqlList.append("if inserting then")
-    sqlList.append(":new.MOF_DIV_CODE := nvl(:new.MOF_DIV_CODE, global_multyear_cz.v_pmdivid);")
-    sqlList.append(":new.FISCAL_YEAR  := nvl(:new.FISCAL_YEAR, global_multyear_cz.v_pmYear);")
-    sqlList.append("end if;")
-    sqlList.append("end TR_" + viewname + ";';")
+    if partationFlag:
+        # 有区划年度才加这个触发器
+        sqlList.append("execute immediate'")
+        sqlList.append(
+            "create or replace trigger TR_" + tablename + " before insert or update or delete ON " + tablename)
+        sqlList.append("for each row")
+        sqlList.append("begin")
+        sqlList.append("if inserting then")
+        sqlList.append(":new.MOF_DIV_CODE := nvl(:new.MOF_DIV_CODE, global_multyear_cz.v_pmdivid);")
+        sqlList.append(":new.FISCAL_YEAR  := nvl(:new.FISCAL_YEAR, global_multyear_cz.v_pmYear);")
+        sqlList.append("end if;")
+        sqlList.append("end TR_" + tablename + ";';")
 
-    sqlList.append("execute immediate'")
-    sqlList.append("create or replace view " + viewname + " as")
-    sqlList.append(
-        "select * from " + tablename + "t  where FISCAL_YEAR= global_multyear_cz.Secu_f_GLOBAL_PARM(''YEAR'') and "
-                                       "MOF_DIV_CODE = "
-                                       "global_multyear_cz.Secu_f_GLOBAL_PARM(''DIVID'')';")
+        # 有区划年度才家这个视图
+        sqlList.append("execute immediate'")
+        sqlList.append("create or replace view " + viewname + " as")
+        sqlList.append(
+            "select * from " + tablename + " t  where FISCAL_YEAR= global_multyear_cz.Secu_f_GLOBAL_PARM(''YEAR'') and "
+                                           "MOF_DIV_CODE = "
+                                           "global_multyear_cz.Secu_f_GLOBAL_PARM(''DIVID'')';")
     # sqlList.append("end;")
 
     # 写入到文件中
@@ -166,13 +194,49 @@ def createTable(tablename, count):
             writeFile.flush()
             writeFile.close()
 
+    dicFileName = "/tmp/gd/" + str(count).zfill(3) + "_dic_" + tablename + "_create_zzw.sql"
+
+    if not os.path.exists(dicFileName):
+        writeFile = open(dicFileName, 'a')
+        try:
+            # 写入
+            writeFile.write("\r\n".join(dicColumnsList))
+        finally:
+            writeFile.flush()
+            writeFile.close()
+
+
+def dicColumns(tableName, colCode, colType, colName):
+    """
+    创建 fasp_t_diccolumn配置信息
+    """
+    tableName = str(tableName).upper()
+    colCode = str(colCode).upper()
+
+    sqls = []
+
+    delSql = "delete from bus_t_diccolumn  where tablecode = '" + tableName + "' and columncode = '" + colCode + "';"
+    sqls.append(delSql)
+
+    insertSql = "insert into bus_t_diccolumn (YEAR, PROVINCE, COLUMNID, COLUMNCODE, TABLECODE, NAME, DATATYPE, " \
+                "DATALENGTH, SCALE, VERSION, NULLABLE, DEFAULTVALUE, DEID, CSID, EXP, ISSYS, DBCOLUMNCODE, " \
+                "ISUSES)values ('2016', '87', sys_guid(), '" + colCode + "', '" + tableName + "', '" + colName \
+                + "', 'S', '100', " \
+                  "null, 1, " \
+                  "0, null, null, null, null, '0', '" + colCode + "', " \
+                                                                  "'0'); "
+    sqls.append(insertSql)
+    return sqls
+
 
 def modifyTable(tableName, colList, count):
     """
     根据表，列变更信息, 生成脚本
     op: 新增字段, 删除字段, 修改字段
-    PAY_DETAIL {'table_name': 'PAY_DETAIL', 'col_code': 'GBString(360)', 'col_type': 'GBString(360)', 'op': '新增字段'}
+    gd_DETAIL {'table_name': 'gd_DETAIL', 'col_code': 'GBString(360)', 'col_type': 'GBString(360)', 'op': '新增字段'}
     """
+
+    dicColumnsList = ["begin"]
 
     # 每个表字段操作可能分三种， 分别处理
     sqlList = [
@@ -191,16 +255,23 @@ def modifyTable(tableName, colList, count):
                 #  colType转换
                 colType = transColType(colType)
                 colName = colMap["col_name"]
-                requiredStr = "not null" if str(colMap["required"]) == "是" else ""
+                # default 0: 如果表里已经有数据, 不指定默认值，无法新增非空字段
+                requiredStr = " default 0 not null" if str(colMap["required"]) == "是" else ""
                 # 构建脚本
                 sqlList.append(
                     "select count(1) into num  from user_tab_columns t where t.table_name = '" + tableName
                     + "' and t.COLUMN_NAME = '" + colCode + "';")
-                sqlList.append("if   num=1   then")
-                sqlList.append("ALTER TABLE " + tableName + " ADD " + colCode + " " + colType + " " + requiredStr + ";")
+                sqlList.append("if   num=0   then")
+                sqlList.append(
+                    "execute immediate 'ALTER TABLE " + tableName + " ADD " + colCode + " " + colType + " " + requiredStr + "';")
                 sqlList.append(
                     "execute immediate 'COMMENT ON COLUMN " + tableName + "." + colCode + " IS ''" + colName + "''';")
                 sqlList.append("end if;")
+
+                # 生成字段注册sql, 先删后插
+                delAndInsert = dicColumns(tableName, colCode, colType, colName)
+                dicColumnsList.append(delAndInsert[0])
+                dicColumnsList.append(delAndInsert[1])
 
         elif key == "修改字段":
             for colMap in group:
@@ -209,14 +280,14 @@ def modifyTable(tableName, colList, count):
                 colCode = colMap["col_code"]
                 colType = colMap["col_type"]
                 colType = transColType(colType)
-                requiredStr = "not null" if str(colMap["required"]) == "是" else ""
+                requiredStr = "default 0  not null" if str(colMap["required"]) == "是" else ""
                 # 构建脚本
                 sqlList.append(
                     "select count(1) into num  from user_tab_columns t where t.table_name = '" + tableName
                     + "' and t.COLUMN_NAME = '" + colCode + "';")
                 sqlList.append("if   num=1   then")
                 sqlList.append(
-                    "ALTER TABLE " + tableName + " MODIFY " + colCode + " " + colType + " " + requiredStr + ";")
+                    "execute immediate 'ALTER TABLE " + tableName + " MODIFY " + colCode + " " + colType + " " + requiredStr + "';")
                 sqlList.append("end if;")
         elif key == "删除字段":
             for colMap in group:
@@ -226,7 +297,7 @@ def modifyTable(tableName, colList, count):
                     "select count(1) into num  from user_tab_columns t where t.table_name = '" + tableName
                     + "' and t.COLUMN_NAME = '" + colCode + "';")
                 sqlList.append("if   num=1   then")
-                sqlList.append("ALTER TABLE " + tableName + " drop " + colCode + ";")
+                sqlList.append("execute immediate 'ALTER TABLE " + tableName + " drop column " + colCode + "';")
                 sqlList.append("end if;")
 
     # 根据sqlList生成脚本
@@ -243,7 +314,7 @@ def modifyTable(tableName, colList, count):
         sqlList.append("execute immediate'")
         sqlList.append("create or replace view V_" + tableName + " as")
         sqlList.append(
-            "select * from " + tableName + "t  where FISCAL_YEAR= global_multyear_cz.Secu_f_GLOBAL_PARM(''YEAR'') and "
+            "select * from " + tableName + " t  where FISCAL_YEAR= global_multyear_cz.Secu_f_GLOBAL_PARM(''YEAR'') and "
                                            "MOF_DIV_CODE = "
                                            "global_multyear_cz.Secu_f_GLOBAL_PARM(''DIVID'')';")
 
@@ -261,6 +332,17 @@ def modifyTable(tableName, colList, count):
             writeFile.flush()
             writeFile.close()
 
+    dicFileName = "/tmp/gd/" + str(count).zfill(3) + "_dic_" + tableName + "_modify_zzw.sql"
+
+    if not os.path.exists(dicFileName):
+        writeFile = open(dicFileName, 'a')
+        try:
+            # 写入
+            writeFile.write("\r\n".join(dicColumnsList))
+        finally:
+            writeFile.flush()
+            writeFile.close()
+
 
 def transColType(colType):
     """
@@ -271,6 +353,8 @@ def transColType(colType):
         colType = colType.replace("Integer", "number")
     elif colType.startswith("Currency"):
         colType = "number(16, 2)"
+    elif colType.startswith("Decimal"):
+        colType = "number(16, 6)"
     elif colType.startswith("DateTime") or colType.startswith("Datetime") or colType.startswith(
             "datetime") or colType.startswith("time"):
         colType = "varchar2(18)"
@@ -295,15 +379,16 @@ if __name__ == '__main__':
     wb = openpyxl.load_workbook('/tmp/收入-2.0表改造生成脚本数据.xlsx', False)
     sheet = wb['sheet1']
     # 获取table_name信息列表
-    count = 0
+    count = 40
     print('sheet1 Reading rows...')
     for row in range(2, len(tuple(sheet.rows))):
         #  获取表列数据
         table = sheet['B' + str(row)].value
+        tableNameCN = sheet['C' + str(row)].value
         if table:
-            # 遍历生成创建表脚本001_xx表_create_zzw.sql, 写入/tmp/pay/下
+            # 遍历生成创建表脚本001_xx表_create_zzw.sql, 写入/tmp/gd/下
             count = count + 1
-            createTable(table, count)
+            createTable(table, tableNameCN, count)
 
     # 获取第二个页签
     sheet = wb['sheet2']
@@ -336,7 +421,7 @@ if __name__ == '__main__':
     #         print (key,g)
 
     # 生成表修改脚本
-    # 转换为字段变化脚本, 并写入/tmp/pay下
+    # 转换为字段变化脚本, 并写入/tmp/gd下
     for key, group in colListGroupByTableName:
         count = count + 1
         modifyTable(key, group, count)

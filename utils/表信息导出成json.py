@@ -6,7 +6,7 @@ import json
 import os
 
 """
-ppass数据库迁移
+浙江 ppass数据库迁移
 """
 # 设置查询编码
 os.environ['NLS_LANG'] = 'AMERICAN_AMERICA.ZHS16GBK'

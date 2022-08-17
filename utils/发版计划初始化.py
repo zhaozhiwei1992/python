@@ -29,8 +29,8 @@ if __name__ == '__main__':
     wb = openpyxl.load_workbook('/tmp/版本发布计划模板.xlsx', False)
     sheet = wb['版本发布计划']
 
-    appid = "PAY_ZJ"
-    version = "V4_0_4_7"
+    # appid = "PAY_ZJ"
+    # version = "V4_0_4_7"
 
     # 读取命令行参数
     appid = sys.argv[1]

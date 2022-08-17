@@ -48,22 +48,36 @@ def getDocDataList194():
         if str(cellContent).startswith("字段名称"):
             tableCount2 += 1
             for i_row in range(1, rowCount):
-                # doc.tables[i].rows[i_row]                        ## 遍历每一个表格的每一行
+                # 遍历每一个表格的每一行
                 rowData = file.tables[i].rows[i_row]
-                colCount = len(rowData.cells)
+                # colCount = len(rowData.cells)
                 # print("colCount", colCount)
+
+                # 将文档中字段类型拆分
+                colTypeStr = str(rowData.cells[3].text)
+                colType = ""
+                colLength = ""
+                if "(" in colTypeStr:
+                    # 英文括号
+                    colType = colTypeStr.split("(")[0]
+                    colLength = colTypeStr.split("(")[1].replace(")", "")
+                elif "（" in colTypeStr:
+                    # 中文括号
+                    colType = colTypeStr.split("（")[0]
+                    colLength = colTypeStr.split("（")[1].replace("）", "")
+                else:
+                    colType = colTypeStr
+                    colLength = "0"
 
                 # 列信息
                 # 序号 字段名称 中文名称 类型及长度 强制 / 可选(M) 是否必填(是/否) 库表要素编号 备注
                 # map形式数据
                 # colMap = {"table_name": tableNameList[tableCount2-1], "col_code": rowData.cells[1].text,
-                #           "col_name": rowData.cells[2].text, "type": str(rowData.cells[3].text).split("(")[0],
-                #           "length": str(rowData.cells[3].text).split("(")[1].replace(")", ""), "required": rowData.cells[4].text}
+                #           "col_name": rowData.cells[2].text, "type": colType,
+                #           "length": colLength, "required": rowData.cells[4].text}
 
                 colRow = (tableNameList[tableCount2 - 1], rowData.cells[1].text, rowData.cells[2].text
-                          , str(rowData.cells[3].text).split("(")[0]
-                          , str(rowData.cells[3].text).split("(")[1].replace(")", "") if len(
-                    str(rowData.cells[3].text).split("(")) > 1 else "0", rowData.cells[4].text, rowData.cells[5].text)
+                          , colType, colLength, rowData.cells[4].text, rowData.cells[5].text)
                 # 游标11匹配
                 tableColList.append(colRow)
     # 321个表
@@ -73,7 +87,11 @@ def getDocDataList194():
 
 
 def saveDataToOracle(tableName, tableColList):
-    # 入库
+    """
+    入库
+    根据表名，及表列配置信息, 批量存储配置
+    程序主动提交
+    """
     ip = '192.168.100.80'
     port = 1521
     SID = 'ORCL'
@@ -87,8 +105,8 @@ def saveDataToOracle(tableName, tableColList):
         cursor = cx_Oracle.Cursor(connection)
         # 写入操作
         cursor.prepare('insert into ' + tableName + ' (table_name, col_code, col_name, type, length, mo, required) '
-                       'values '
-                       '(:1, :2, :3, :4, :5, :6, :7)')
+                                                    'values '
+                                                    '(:1, :2, :3, :4, :5, :6, :7)')
         # 执行入库
         cursor.executemany(None, tableColList)
         connection.commit()

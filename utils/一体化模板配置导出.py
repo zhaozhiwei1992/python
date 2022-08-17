@@ -8,7 +8,8 @@ import re
 # select * from fasp_t_pabusinessmould t where t.appid = 'pay';
 # select * from fasp_t_pabusinessmouldconfig t where t.mouldid = '437A05D24863A1E540612AA5NCKLKJHG';
 # --
-# select * from fasp_t_pabusinessmodelmenu t where t.mouldid = '437A05D24863A1E540612AA5NCKLKJHG'; --/pay/approvalform/edit
+# --/pay/approvalform/edit
+# select * from fasp_t_pabusinessmodelmenu t where t.mouldid = '437A05D24863A1E540612AA5NCKLKJHG';
 #
 # select * from bus_t_pageconsole t where t.url = '/pay/approvalform/edit';
 # select * from bus_t_pageconsolecomconfig t where t.url = '/pay/approvalform/edit'; --key

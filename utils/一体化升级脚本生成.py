@@ -1,7 +1,10 @@
 import cx_Oracle
 
 
-def droptable(tablename, viewname):
+def createDropTable(tablename, viewname):
+    """
+    生成createDrop形式的建表语句
+    """
     tablename = tablename.upper()
     viewname = viewname.upper()
     sqlList = []
@@ -72,7 +75,8 @@ def droptable(tablename, viewname):
     sqlList.append("execute immediate'")
     sqlList.append("create or replace view " + viewname + " as")
     sqlList.append(
-        "select * from " + tablename + " t  where year= global_multyear_cz.Secu_f_GLOBAL_PARM(''YEAR'') and province = global_multyear_cz.Secu_f_GLOBAL_PARM(''DIVID'')';")
+        "select * from " + tablename + " t  where year= global_multyear_cz.Secu_f_GLOBAL_PARM(''YEAR'') and province = "
+                                       "global_multyear_cz.Secu_f_GLOBAL_PARM(''DIVID'')';")
     sqlList.append("end;")
     return "\r\n".join(sqlList)
 
@@ -82,4 +86,4 @@ if __name__ == '__main__':
     tablename = 'PAY_APPLY_CORRECTION'
     # viewname
     viewname = 'V_PAY_APPLY_CORRECTION'
-    print(droptable(tablename, viewname))
+    print(createDropTable(tablename, viewname))

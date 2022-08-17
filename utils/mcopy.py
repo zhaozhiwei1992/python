@@ -19,8 +19,7 @@ elif len(sys.argv) == 2:
 
 mcbShelf.close()
 
-arr = ['a', 'b', 'c']
-arr.append('d')
+arr = ['a', 'b', 'c', 'd']
 print(arr)
-arr.reverse();
+arr.reverse()
 print(arr)
