@@ -66,6 +66,11 @@ if __name__ == '__main__':
     sheet['G7'].value = version.replace("_", ".")
     sheet['G8'].value = version.replace("_", ".")
 
+    # 02_发版测试
+    sheet = wb['02_发版测试']
+    sheet['F2'].value = "{}月{}日".format(month, day)
+    sheet['E3'].value = "{}/{}/{}-{}/{}/{}".format(year, month-1, day, year, month, day)
+
     # 03_版本更新内容
     sheet = wb['03_版本更新内容']
     # 遍历数据增加行填充数据

@@ -16,7 +16,7 @@
 数，即它不包含第二个数。
 
 """
-step = 2
+step = 1
 # here put the import lib
 for i in range(1, 5, step):
     print("当前位置", i)
@@ -30,3 +30,6 @@ for i in [1, 2, 3, 4]:
     print("当前位置", i)
 else:
     print('done .')
+
+for i in range(5, 10):
+    print("xx", i)

@@ -1,9 +1,11 @@
 print("{} {}".format("hello", "world"))
 # tuple作为参数不能用format传，否则会出现index溢出
-print("%s %s"%("hello","world"))
-print("insert into standard_field (table_name, code, name, type, length, required) values ('{}', '{}', '{}', '{}', '{}', '{}')".format('ELE_CATALOG', 'ELE_CATALOG_ID', '目录主键', 'String', '38', '1'))
+print("%s %s" % ("hello", "world"))
+print(
+    "insert into standard_field (table_name, code, name, type, length, required) values ('{}', '{}', '{}', '{}', '{}', '{}')".format(
+        'ELE_CATALOG', 'ELE_CATALOG_ID', '目录主键', 'String', '38', '1'))
 
-str="|"
+str = "|"
 joinstr = str.join(["pig", "dog", "cat"])
 print(joinstr)
 
@@ -25,16 +27,18 @@ print('hh ' '\n' 'hello')
 print('hello my name is \
     hhhhhhhh')
 
-name = 'Swaroop' # This is a string object
+name = 'Swaroop'  # This is a string object
 if name.startswith('Swa'):
-       print ('Yes, the string starts with "Swa"')
+    print('Yes, the string starts with "Swa"')
 
 if 'a' in name:
-       print ('Yes, it contains the string "a"')
+    print('Yes, it contains the string "a"')
 
 if name.find('war') != -1:
-       print ('Yes, it contains the string "war"')
+    print('Yes, it contains the string "war"')
 
 delimiter = '_*_'
 mylist = ['Brazil', 'Russia', 'India', 'China']
-print (delimiter.join(mylist))
+print(delimiter.join(mylist))
+
+print("测试字符串切片", "12345"[0:3:])
