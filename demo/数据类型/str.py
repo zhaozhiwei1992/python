@@ -41,4 +41,15 @@ delimiter = '_*_'
 mylist = ['Brazil', 'Russia', 'India', 'China']
 print(delimiter.join(mylist))
 
-print("测试字符串切片", "12345"[0:3:])
+# 格式： [start:end:step]
+#
+# • [:] 提取从开头（默认位置0）到结尾（默认位置-1）的整个字符串
+# • [start:] 从start 提取到结尾
+# • [:end] 从开头提取到end - 1
+# • [start:end] 从start 提取到end - 1
+# • [start:end:step] 从start 提取到end - 1，每step 个字符提取一个
+# • 左侧第一个字符的位置/偏移量为0，右侧最后一个字符的位置/偏移量为-1
+slice_str = '12345'
+print("从0开始3个字符", slice_str[0:3:])
+print("从头到尾", slice_str[:])
+print("最后一个字符", slice_str[-1:])

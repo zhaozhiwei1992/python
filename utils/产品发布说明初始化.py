@@ -28,7 +28,10 @@ if __name__ == '__main__':
     version = sys.argv[2]
 
     # 读取发布计划中内容, 用来填充发布说明
-    fbFile = '/mnt/d/codetag/ifmis-spring-cloud4.0/' + appid.lower() + '/V' + version + '/发布说明/' + appid + '_V_' + version + '版本发布计划.xlsx'
+    if appid == "NFCS":
+        fbFile = '/mnt/d/codetag/' + appid.upper() + '/V' + version + '/发布说明/' + appid + '_V_' + version + '版本发布计划.xlsx'
+    else:
+        fbFile = '/mnt/d/codetag/ifmis-spring-cloud4.0/' + appid.lower() + '/V' + version + '/发布说明/' + appid + '_V_' + version + '版本发布计划.xlsx'
     wb = openpyxl.load_workbook(fbFile, False)
     sheet = wb['版本发布计划']
 
@@ -46,7 +49,10 @@ if __name__ == '__main__':
     wb.close()
 
     # 调整发布说明内容
-    fbFile = '/mnt/d/codetag/ifmis-spring-cloud4.0/' + appid.lower() + '/V' + version + '/发布说明/产品发布说明模板.xlsx'
+    if appid.upper() == "NFCS":
+        fbFile = '/mnt/d/codetag/' + appid.upper() + '/V' + version + '/发布说明/产品发布说明模板.xlsx'
+    else:
+        fbFile = '/mnt/d/codetag/ifmis-spring-cloud4.0/' + appid.lower() + '/V' + version + '/发布说明/产品发布说明模板.xlsx'
     wb = openpyxl.load_workbook(fbFile, False)
     sheet = wb['01_发版说明']
     # 修改版本信息等
@@ -59,9 +65,14 @@ if __name__ == '__main__':
     # 系统版本号
     sheet['C7'].value = version.replace("_", ".")
     sheet['C8'].value = version.replace("_", ".")
-    # 部署文件名 ifmis-pay-service-4.0.3.6-SNAPSHOT.jar
-    sheet['E7'].value = "ifmis-{}-service-{}-SNAPSHOT.jar".format(appid.lower(), version.replace("_", "."))
-    sheet['E8'].value = "ifmis-{}-webapp-{}-SNAPSHOT.jar".format(appid.lower(), version.replace("_", "."))
+    if appid.upper() == "NFCS":
+        # 部署文件名 ifmis-pay-service-4.0.3.6-SNAPSHOT.jar
+        sheet['E7'].value = "ifmis-data-center-{}-SNAPSHOT.jar".format(version.replace("_", "."))
+        sheet['E8'].value = ""
+    else:
+        # 部署文件名 ifmis-pay-service-4.0.3.6-SNAPSHOT.jar
+        sheet['E7'].value = "ifmis-{}-service-{}-SNAPSHOT.jar".format(appid.lower(), version.replace("_", "."))
+        sheet['E8'].value = "ifmis-{}-webapp-{}-SNAPSHOT.jar".format(appid.lower(), version.replace("_", "."))
     # 数据库版本
     sheet['G7'].value = version.replace("_", ".")
     sheet['G8'].value = version.replace("_", ".")
@@ -82,8 +93,12 @@ if __name__ == '__main__':
         sheet.cell(rowIndex + 3, 2,
                    '问题' if srcId is not None and str(srcId).__contains__("#") else '需求')
         sheet.cell(rowIndex + 3, 3, rowIndex + 1)
-        sheet.cell(rowIndex + 3, 4, '预算执行')
-        sheet.cell(rowIndex + 3, 5, '集中支付')
+        if appid.upper() == "NFCS":
+            sheet.cell(rowIndex + 3, 4, '人大联网监督系统')
+            sheet.cell(rowIndex + 3, 5, '人大联网监督系统')
+        else:
+            sheet.cell(rowIndex + 3, 4, '预算执行')
+            sheet.cell(rowIndex + 3, 5, '集中支付')
         sheet.cell(rowIndex + 3, 6, rowData['content'])
         sheet.cell(rowIndex + 3, 7, rowData['srcId'])
 
