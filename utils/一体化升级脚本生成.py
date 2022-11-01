@@ -11,15 +11,9 @@ def createDropTable(tablename, viewname):
     sqlList.append("declare")
     sqlList.append("   num number;")
     sqlList.append("begin")
-    sqlList.append("select count(1) into num from user_constraints t where t.table_name = '" + tablename + "';")
-    sqlList.append("if num > 0 then")
-    sqlList.append(
-        "execute immediate 'alter table " + tablename + " drop constraint PK_" + viewname + " cascade drop index';")
-    sqlList.append("end if;")
     sqlList.append("select count(1) into num from user_tables where TABLE_NAME = '" + tablename + "';")
-    sqlList.append("if   num=1   then")
-    sqlList.append("execute immediate 'drop table " + tablename + "';")
-    sqlList.append("end if;")
+    # 表不存在才去创建
+    sqlList.append("if   num=0   then")
     sqlList.append("execute immediate'")
     sqlList.append("create table " + tablename)
     sqlList.append("(")
@@ -58,6 +52,12 @@ def createDropTable(tablename, viewname):
     sqlList.append(")")
     sqlList.append(")';")
 
+    # 约束处理
+    sqlList.append("select count(1) into num from user_constraints t where t.table_name = '" + tablename + "';")
+    sqlList.append("if num > 0 then")
+    sqlList.append(
+        "execute immediate 'alter table " + tablename + " drop constraint PK_" + viewname + " cascade drop index';")
+    sqlList.append("end if;")
     sqlList.append("execute immediate'")
     sqlList.append("alter table " + tablename)
     sqlList.append("add constraint PK_" + viewname + " primary key (GUID)';")
@@ -71,6 +71,8 @@ def createDropTable(tablename, viewname):
     sqlList.append(":new.year     := nvl(:new.year, global_multyear_cz.v_pmYear);")
     sqlList.append("end if;")
     sqlList.append("end TR_" + viewname + ";';")
+
+    sqlList.append("end if;")
 
     sqlList.append("execute immediate'")
     sqlList.append("create or replace view " + viewname + " as")

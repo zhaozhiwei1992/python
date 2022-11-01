@@ -9,6 +9,10 @@ person['age'] = 18
 for k in person.keys():
     print("keys: " + k)
 
+# python2 print(person.has_key("age"))
+print(True if "age" in person.keys() else False)
+
+
 for v in person.values():
     print("values: ", v)
 

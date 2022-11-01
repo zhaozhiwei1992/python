@@ -47,9 +47,8 @@ def createTable(tablename, tableNameCN, count):
         "execute immediate 'alter table " + tablename + " drop constraint PK_" + viewname + " cascade drop index';",
         "end if;",
         "select count(1) into num from user_tables where TABLE_NAME = '" + tablename + "';",
-        "if   num=1   then",
-        "execute immediate 'drop table " + tablename + "';",
-        "end if;",
+        # 没有表才去创建
+        "if   num=0   then",
         "execute immediate'",
         "create table " + tablename, "("]
 
@@ -147,6 +146,9 @@ def createTable(tablename, tableNameCN, count):
         sqlList.append(")")
 
     sqlList.append("';")
+
+    # 判断表不存在 count == 0才创建, 结束if
+    sqlList.append("end if;")
 
     # 主键未定, 单独处理
     # sqlList.append("execute immediate'")
@@ -292,6 +294,11 @@ def modifyTable(tableName, colList, count):
         elif key == "删除字段":
             for colMap in group:
                 colCode = colMap["col_code"]
+                colType = str(colMap["col_type"])
+                #  colType转换
+                colType = transColType(colType)
+                colName = colMap["col_name"]
+
                 # 构建脚本
                 sqlList.append(
                     "select count(1) into num  from user_tab_columns t where t.table_name = '" + tableName
@@ -299,6 +306,11 @@ def modifyTable(tableName, colList, count):
                 sqlList.append("if   num=1   then")
                 sqlList.append("execute immediate 'ALTER TABLE " + tableName + " drop column " + colCode + "';")
                 sqlList.append("end if;")
+
+                # 生成字段注册sql, 先删后插
+                delAndInsert = dicColumns(tableName, colCode, colType, colName)
+                # 只保留删除
+                dicColumnsList.append(delAndInsert[0])
 
     # 根据sqlList生成脚本
     # 重建视图脚本, 得判断下表是否有区划年度字段先
