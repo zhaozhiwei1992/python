@@ -30,7 +30,7 @@ if __name__ == '__main__':
     sheet = wb['版本发布计划']
 
     # appid = "PAY_ZJ"
-    # version = "V4_0_4_7"
+    # version = "V_4_0_4_7"
 
     # 读取命令行参数
     appid = sys.argv[1]
@@ -44,6 +44,42 @@ if __name__ == '__main__':
     # 处理: 给合并单元格的初始位置写数据就行, 仔细看是从哪一列开始合并的
     sheet['E4'].value = version
     sheet['E5'].value = "{}/{}/{}".format(year, month, daysOfMonth)
+
+    # 填充发版计划内容
+    srcFile = "/home/zhaozhiwei/workspace/项目管理/发版计划/"
+    # 查询版本开始的内容, 循环填充
+    if "GFBI" == appid:
+        sheet['C4'].value = "预算执行报表系统"
+        srcFile += "预算执行报表发版计划.org"
+    elif "PAY" == appid:
+        sheet['C4'].value = "支付系统"
+        srcFile += "支付发版计划.org"
+    elif "PAYZJ" == appid:
+        sheet['C4'].value = "支付系统"
+        srcFile += "浙江支付发版计划.org"
+
+    f = open(srcFile)
+    # 一次读取所有行
+    fileContentList = f.readlines()
+
+    startRow = 8
+    flag = 0
+    for lineContent in fileContentList:
+        # 如果找到这个版本，则准备开始写入数据, 找到需要1开始的
+        if version.replace("V_", "") in lineContent:
+            flag = 1
+        if flag == 1 and "发布内容" in lineContent:
+            flag = 2
+        if flag == 2:
+            # 开始写入
+            # 第9行开始, C:内容 D:禅道编号, 空格分隔
+            rowArray = lineContent.split(" ")
+            if (len(rowArray)) == 3:
+                sheet['C' + str(startRow)].value = rowArray[1] + "|" + rowArray[2]
+            elif len(rowArray) > 3:
+                sheet['C' + str(startRow)].value = rowArray[1] + "|" + rowArray[3]
+                sheet['D' + str(startRow)].value = rowArray[2]
+            startRow = startRow+1
 
     # 可以另存多个
     wb.save('/tmp/{}_{}版本发布计划.xlsx'.format(appid, version))

@@ -8,7 +8,7 @@ import openpyxl
 
 传入版本参数
 
-python /home/zhaozhiwei/workspace/python/utils/产品发布说明初始化.py PAYZJ V_$VERSION
+python /home/zhaozhiwei/workspace/python/utils/产品发布说明初始化.py PAYZJ VERSION
 
 """
 if __name__ == '__main__':

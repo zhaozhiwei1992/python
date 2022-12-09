@@ -33,3 +33,7 @@ else:
 
 for i in range(5, 10):
     print("xx", i)
+
+print("测试")
+for i in range(2, 3):
+    print(i)

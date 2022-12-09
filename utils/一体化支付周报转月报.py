@@ -28,9 +28,9 @@ def getWeekDocDataList(year, month):
 
     # 1. 便利目录下当月周报, 文件名格式如: 周报-支付20220815-20220819.doc, 获取前缀是周报-支付202208*.doc即可
     # for filename in os.listdir("/mnt/d/00共享/04工作计划/01周计划/2022年"):
-    for filename in os.listdir("/mnt/d/00共享/04工作计划/01周计划/{}年".format(year)):
+    for filename in os.listdir("/mnt/d/00共享/04工作计划/01周计划/{}年/支付周报/".format(year)):
         # 绝对路径
-        fileFullName = "/mnt/d/00共享/04工作计划/01周计划/{}年/{}".format(year, filename)
+        fileFullName = "/mnt/d/00共享/04工作计划/01周计划/{}年/支付周报/{}".format(year, filename)
         if filename.startswith("周报-支付{}{}".format(year, month)):
             # 2. 读取每个word数据, 进行构建
             file = docx.Document(fileFullName)

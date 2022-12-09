@@ -55,7 +55,7 @@ def createTable(tablename, tableNameCN, count):
     # 字段信息
     con = cx_Oracle.connect('pay_34/1@192.168.100.80/orcl')
     cur = con.cursor()
-    sql = "select t.* from STANDARD_FIELD_V2_194 t where t.table_name = :table_name"
+    sql = "select t.* from STANDARD_FIELD_V2_216 t where t.table_name = :table_name"
     cur.prepare(sql)
     cur.execute(None, {'table_name': tablename})
     res = cur.fetchall()
@@ -317,7 +317,7 @@ def modifyTable(tableName, colList, count):
     # 字段信息
     con = cx_Oracle.connect('pay_34/1@192.168.100.80/orcl')
     cur = con.cursor()
-    sql = "select t.* from STANDARD_FIELD_V2_194 t where t.table_name = :table_name and t.COL_CODE in (" \
+    sql = "select t.* from STANDARD_FIELD_V2_216 t where t.table_name = :table_name and t.COL_CODE in (" \
           "'MOF_DIV_CODE', 'FISCAL_YEAR') "
     cur.prepare(sql)
     cur.execute(None, {'table_name': str(tableName).upper()})
@@ -393,7 +393,7 @@ if __name__ == '__main__':
     # 获取table_name信息列表
     count = 40
     print('sheet1 Reading rows...')
-    for row in range(2, len(tuple(sheet.rows))):
+    for row in range(2, len(tuple(sheet.rows)) + 1):
         #  获取表列数据
         table = sheet['B' + str(row)].value
         tableNameCN = sheet['C' + str(row)].value
