@@ -1,7 +1,6 @@
 import os
 import time
 
-
 def isLocked():
     result = os.system("fuser /var/lock/slim.lock")
     if result == 0:
