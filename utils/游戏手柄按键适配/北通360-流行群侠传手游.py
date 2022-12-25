@@ -65,9 +65,12 @@ class JoyToKey:
             if joystick.get_button(3) == 1:
                 # 手柄Y键 --> 键盘p
                 keyboard.press('p')
+            if joystick.get_button(4) == 1:
+                keyboard.press('h')
             if joystick.get_button(5) == 1:
                 # 手柄又键 --> 键盘l(换武器)
-                keyboard.press('l')
+                # keyboard.press('l')
+                keyboard.press('j')
         elif event.type == pygame.JOYBUTTONUP:
             # print("Joystick button release.")
             if joystick.get_button(7) == 0:
@@ -85,9 +88,13 @@ class JoyToKey:
             if joystick.get_button(3) == 0:
                 # 手柄Y键 --> 键盘p
                 keyboard.release('p')
+            if joystick.get_button(4) == 0:
+                keyboard.release('h')
             if joystick.get_button(5) == 0:
                 # 手柄又键 --> 键盘l(换武器)
-                keyboard.release('l')
+                # keyboard.release('l')
+                # 攻击键容易连点
+                keyboard.release('j')
 
         # 攻击键
         elif event.type == pygame.JOYAXISMOTION:
