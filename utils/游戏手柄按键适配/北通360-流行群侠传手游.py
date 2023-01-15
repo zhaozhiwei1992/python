@@ -103,10 +103,11 @@ class JoyToKey:
                 # 手柄左x --> 键盘h
                 # 注意: 这里需要让手柄, pygame来控制按压和释放, 如果用pyautogui, keydown每次会触发很多按压,(连点)
                 # 还是用这个保险
-                keyboard.press('h')
+                #keyboard.press('h')
             if joystick.get_axis(5) > 0:
                 # 手柄右x --> 键盘j
-                keyboard.press('j')
+                # 用按键控制, 防止连击
+                #keyboard.press('j')
             if round(joystick.get_axis(1)) < 0:
                 # 前
                 keyboard.press('w')
@@ -125,10 +126,10 @@ class JoyToKey:
             # print("s", joystick.get_axis(1))
             if joystick.get_axis(2) < 0:
                 # 手柄左x --> 键盘h
-                keyboard.release('h')
+                #keyboard.release('h')
             if joystick.get_axis(5) < 0:
                 # 手柄右x --> 键盘j
-                keyboard.release('j')
+                #keyboard.release('j')
             if round(joystick.get_axis(0)) == 0:
                 # 释放左右
                 keyboard.release('a')
