@@ -103,10 +103,11 @@ if __name__ == '__main__':
     # 获取年 月
     year = now.year
     month = now.month
+
     # 1. 遍历获取当月周报数据, 并写入到一个python对象中
-    tableColList = getWeekDocDataList(str(year), str(month))
+    tableColList = getWeekDocDataList(str(year), str(month).zfill(2))
     # print(tableColList)
     # 2. 根据python对象分页签写入到月报excel中
     if len(tableColList) > 0:
-        weekDataWriteToMonthDoc(str(year), str(month), tableColList)
+        weekDataWriteToMonthDoc(str(year), str(month).zfill(2), tableColList)
     # 3. 手动编辑文档, 填充公式并计算

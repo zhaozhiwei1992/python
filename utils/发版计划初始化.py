@@ -57,6 +57,9 @@ if __name__ == '__main__':
     elif "PAYZJ" == appid:
         sheet['C4'].value = "支付系统"
         srcFile += "浙江支付发版计划.org"
+    elif "NFCS" == appid:
+        sheet['C4'].value = "人大监督联网融合中心"
+        srcFile += "人大监督联网融合中心发版计划.org"
 
     f = open(srcFile)
     # 一次读取所有行
@@ -75,10 +78,13 @@ if __name__ == '__main__':
             # 第9行开始, C:内容 D:禅道编号, 空格分隔
             rowArray = lineContent.split(" ")
             if (len(rowArray)) == 3:
+                # 没有禅道号的, 人员|内容
                 sheet['C' + str(startRow)].value = rowArray[1] + "|" + rowArray[2]
             elif len(rowArray) > 3:
-                sheet['C' + str(startRow)].value = rowArray[1] + "|" + rowArray[3]
-                sheet['D' + str(startRow)].value = rowArray[2]
+                # 人员|内容
+                sheet['C' + str(startRow)].value = rowArray[2] + "|" + rowArray[3]
+                # 禅道号
+                sheet['D' + str(startRow)].value = rowArray[1]
             startRow = startRow+1
 
     # 可以另存多个

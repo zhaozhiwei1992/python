@@ -98,7 +98,10 @@ if __name__ == '__main__':
             sheet.cell(rowIndex + 3, 5, '人大联网监督系统')
         else:
             sheet.cell(rowIndex + 3, 4, '预算执行')
-            sheet.cell(rowIndex + 3, 5, '集中支付')
+            if appid.upper() == "GFBI":
+                sheet.cell(rowIndex + 3, 5, '预算执行报表')
+            else:
+                sheet.cell(rowIndex + 3, 5, '集中支付')
         sheet.cell(rowIndex + 3, 6, rowData['content'])
         sheet.cell(rowIndex + 3, 7, rowData['srcId'])
 
