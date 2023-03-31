@@ -69,7 +69,8 @@ if __name__ == '__main__':
     flag = 0
     for lineContent in fileContentList:
         # 如果找到这个版本，则准备开始写入数据, 找到需要1开始的
-        if version.replace("V_", "") in lineContent:
+        # 发版计划org文件里增加了发版邮件等工具, 里面也包含版本号, 防止错误数据, 只找版本在标题上的
+        if version.replace("V_", "* ") in lineContent:
             flag = 1
         if flag == 1 and "发布内容" in lineContent:
             flag = 2
