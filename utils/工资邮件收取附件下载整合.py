@@ -46,7 +46,7 @@ def get_att(msg, savepath):
             filename = dh[0][0]
             if dh[0][1]:
                 filename = decode_str(str(filename, dh[0][1]))  # 将附件名称可读化
-                print("邮件中附件名称", filename)
+                # print("邮件中附件名称", filename)
                 # filename = filename.encode("utf-8")
             data = part.get_payload(decode=True)  # 下载附件
             # 在指定目录下创建文件，注意二进制文件需要用wb模式打开
@@ -166,7 +166,7 @@ def excel_archive(savepath):
     # print('excel数据', dataList)
     # map填充到list, 构建成orgmode表格形式
     # 下边输出的玩意儿copy贴到orgmode， 然后ctrl+c | 搞定
-    print('复制下边输出结果到orgmode')
+    # print('复制下边输出结果到orgmode')
     for item in dataList:
         print(item['时间'], ' ', item['实发'], ' ', item['个税'], ' ', item['养老'], ' ', item['医疗'], ' ', item['公积金'])
 
