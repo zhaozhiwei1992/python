@@ -29,12 +29,12 @@ if __name__ == '__main__':
     wb = openpyxl.load_workbook('/tmp/版本发布计划模板.xlsx', False)
     sheet = wb['版本发布计划']
 
-    # appid = "PAY_ZJ"
-    # version = "V_4_0_4_7"
+    appid = "ISA"
+    version = "V_4_0_0_0"
 
     # 读取命令行参数
-    appid = sys.argv[1]
-    version = sys.argv[2]
+    # appid = sys.argv[1]
+    # version = sys.argv[2]
 
     # 修改产品表示, 版本号, 预计发布日期
     sheet['C3'].value = appid
@@ -60,6 +60,9 @@ if __name__ == '__main__':
     elif "NFCS" == appid:
         sheet['C4'].value = "人大监督联网融合中心"
         srcFile += "人大监督联网融合中心发版计划.org"
+    elif "ISA" == appid:
+        sheet['C4'].value = "单位端数据交换服务"
+        srcFile += "单位端数据交换服务发版计划.org"
 
     f = open(srcFile)
     # 一次读取所有行

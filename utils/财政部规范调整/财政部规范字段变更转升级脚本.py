@@ -1,9 +1,11 @@
 # !user/bin/python
 # _*_ coding: utf-8 _*_
 #
-# @Title: 一体化规范字段变更转升级脚本.py
+# @Title: 财政部规范字段变更转升级脚本.py
 # @Description:
 # 根据整理的新规范字段变更excel, 转换为升级脚本
+# 转换源头有两种, 一种是通过excel格式解析生成sql
+# 另一种读取数据库规范表配置, 转换成sql
 # @author zhaozhiwei
 # @date 2022/8/11 下午5:34
 # @version V1.0
@@ -11,8 +13,10 @@
 import cx_Oracle
 import os
 
-from operator import itemgetter  # itemgetter用来去dict中的key，省去了使用lambda函数
-from itertools import groupby  # itertool还包含有其他很多函数，比如将多个list联合起来。。
+# itemgetter用来去dict中的key，省去了使用lambda函数
+from operator import itemgetter
+# itertool还包含有其他很多函数，比如将多个list联合起来。。
+from itertools import groupby
 import openpyxl
 
 # 设置查询编码
