@@ -48,6 +48,7 @@ def compareToExcel(tableV1, tableV2):
 
 
         # v2版本删除的表
+        # 如果跟集成库比对这个不准, 生成后删掉完事儿
         sql = "SELECT distinct table_name_cn, table_name FROM " + tableV1 + " t1 WHERE t1.table_name NOT IN (SELECT t2.table_name FROM " + tableV2+ " t2)"
         cursor.prepare(sql)
         cursor.execute(None)
@@ -98,7 +99,7 @@ def compareToExcel(tableV1, tableV2):
 
             # v2->v1版本变更的列
             # 1.1 必填变更
-            sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.required <> t2.required"
+            sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required, t1.type as v2_type, t1.length as v2_length, t1.required as v2_required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.required <> t2.required"
             cursor.prepare(sql)
             cursor.execute(None)
             res = cursor.fetchall()
@@ -112,13 +113,21 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['type'] = str(result[2])
                 fieldObj['length'] = str(result[3])
                 fieldObj['required'] = str(result[4])
+                # v2部分
+                fieldObj['v2_type'] = str(result[5])
+                fieldObj['v2_length'] = str(result[6])
+                fieldObj['v2_required'] = str(result[7])
                 modFieldList.append(fieldObj)
             # 1.2 长度变更
-            sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.length <> t2.length"
+            sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required, t1.type as v2_type, t1.length as v2_length, t1.required as v2_required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.length <> t2.length"
             cursor.prepare(sql)
             cursor.execute(None)
             res = cursor.fetchall()
             for result in res:
+                # 金额的变化跳过, 基本是要按照一体化字段来处理 Currency
+                # 日期的也跳过, 一体化为准
+                if str(result[5]) in ["Currency", "Date", "DateTime"]:
+                    continue
                 fieldObj = {}
                 fieldObj['table_name'] = tableName
                 fieldObj['table_name_cn'] = tableCName
@@ -128,13 +137,25 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['type'] = str(result[2])
                 fieldObj['length'] = str(result[3])
                 fieldObj['required'] = str(result[4])
+                # v2部分
+                fieldObj['v2_type'] = str(result[5])
+                fieldObj['v2_length'] = str(result[6])
+                fieldObj['v2_required'] = str(result[7])
                 modFieldList.append(fieldObj)
             # 1.3 类型变更
-            sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.type <> t2.type"
+            sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required, t1.type as v2_type, t1.length as v2_length, t1.required as v2_required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.type <> t2.type"
             cursor.prepare(sql)
             cursor.execute(None)
             res = cursor.fetchall()
             for result in res:
+                # 类型变化, 一体化和规范表的字段要有个转换, 比如NString啥的, 对于一体化跟varchar2等价, 跳过
+                # 金额在规范类型Currency也跳过
+                if (str(result[2]) == "VARCHAR2" and "String" in str(result[5])) or (str(result[5]) == "Currency"):
+                    continue
+                # 金额的变化跳过, 基本是要按照一体化字段来处理 Currency
+                # 日期的也跳过, 一体化为准
+                if str(result[5]) in ["Currency", "Date", "DateTime"]:
+                    continue
                 fieldObj = {}
                 fieldObj['table_name'] = tableName
                 fieldObj['table_name_cn'] = tableCName
@@ -144,8 +165,13 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['type'] = str(result[2])
                 fieldObj['length'] = str(result[3])
                 fieldObj['required'] = str(result[4])
+                # v2部分
+                fieldObj['v2_type'] = str(result[5])
+                fieldObj['v2_length'] = str(result[6])
+                fieldObj['v2_required'] = str(result[7])
                 modFieldList.append(fieldObj)
             # v2->v1版本删除的列
+            # 跟集成库比对删除列无意义, excel中删掉即可
             sql = "SELECT col_code, col_name, type, length, required FROM " + tableV1 + " t1 WHERE t1.table_name = '" + tableName + "' AND t1.col_code NOT IN ( SELECT t2.col_code FROM " + tableV2 + " t2 WHERE t2.table_name = '" + tableName + "')"
             cursor.prepare(sql)
             cursor.execute(None)
@@ -160,7 +186,8 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['type'] = str(result[2])
                 fieldObj['length'] = str(result[3])
                 fieldObj['required'] = str(result[4])
-                delFieldList.append(fieldObj)
+                # 集成库比对, 不需要删除列，临时注释掉
+                # delFieldList.append(fieldObj)
 
         connection.commit()
         cursor.close()
@@ -204,8 +231,8 @@ def compareToExcel(tableV1, tableV2):
         sheet['D' + str(index + 2)].value = ele['operator']
         sheet['E' + str(index + 2)].value = ele['col_code']
         sheet['F' + str(index + 2)].value = ele['col_name']
-        sheet['G' + str(index + 2)].value = ele['type'] + "(" + ele['length']+ ")"
-        sheet['H' + str(index + 2)].value = ele['required']
+        sheet['G' + str(index + 2)].value = "V1: " + ele['type'] + "(" + ele['length']+ ")" + ", V2: " + ele['v2_type'] + "(" + ele['v2_length']+ ")"
+        sheet['H' + str(index + 2)].value = "V1: " + ele['required'] + ", V2: " + ele['v2_required']
 
     sheet = wb['v2版本删除的列']
     for index, ele in enumerate(delFieldList):
@@ -223,4 +250,4 @@ def compareToExcel(tableV1, tableV2):
 if __name__ == '__main__':
 
     # 生成字段比对报告, 根据两个版本表比对
-    compareToExcel("STANDARD_FIELD_V1_STANDARD", "STANDARD_FIELD_V2_STANDARD")
+    compareToExcel("STANDARD_FIELD_V1_JC20230505", "STANDARD_FIELD_V2_20230505")

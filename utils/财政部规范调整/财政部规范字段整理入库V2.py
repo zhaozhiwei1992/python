@@ -183,13 +183,13 @@ def getDocDataListV1(fileName="v2.0 .149-20210802预算管理一体化系统技�
 if __name__ == '__main__':
 
     # 将读取数据整理标准格式, 方便写入数据库或者excel中
-    # tableColList = getDocDataListV2("2.中册-预算管理一体化系统技术标准20230321.docx")
-    # saveDataToOracle("STANDARD_FIELD_V2_STANDARD", tableColList)
+    # tableColList = getDocDataListV2("2.中册-预算管理一体化系统技术标准20230505.docx")
+    # saveDataToOracle("STANDARD_FIELD_V2_20230505", tableColList)
 
     # tableColList = getDocDataListV1("预算管理一体化系统技术标准（下册）.docx")
     # saveDataToOracle("STANDARD_FIELD_V1_STANDARD", tableColList)
 
-    # 数据生成后自行将表中table_name_cn进行填充
+    # 数据生成后自行将表中table_name_cn进行填充, 调整一些有误的内容
 
     # 生成字段比对报告, 根据两个版本表比对
-    exportExcel.compareToExcel("STANDARD_FIELD_V1_STANDARD", "STANDARD_FIELD_V2_STANDARD")
+    exportExcel.compareToExcel("STANDARD_FIELD_V1_JC20230505", "STANDARD_FIELD_V2_20230505")
