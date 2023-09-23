@@ -53,3 +53,6 @@ slice_str = '12345'
 print("从0开始3个字符", slice_str[0:3:])
 print("从头到尾", slice_str[:])
 print("最后一个字符", slice_str[-1:])
+
+colType = "V1: VARCHAR2(7), V2: NString(11)"
+print(colType[colType.find("V2:") + 4:])

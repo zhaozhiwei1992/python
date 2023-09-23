@@ -29,12 +29,9 @@ if __name__ == '__main__':
     wb = openpyxl.load_workbook('/tmp/版本发布计划模板.xlsx', False)
     sheet = wb['版本发布计划']
 
-    appid = "ISA"
-    version = "V_4_0_0_0"
-
     # 读取命令行参数
-    # appid = sys.argv[1]
-    # version = sys.argv[2]
+    appid = sys.argv[1]
+    version = sys.argv[2]
 
     # 修改产品表示, 版本号, 预计发布日期
     sheet['C3'].value = appid

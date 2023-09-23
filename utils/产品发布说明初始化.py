@@ -28,7 +28,7 @@ if __name__ == '__main__':
     version = sys.argv[2]
 
     # 读取发布计划中内容, 用来填充发布说明
-    if appid == "NFCS":
+    if appid == "NFCS" or appid == "ISA":
         fbFile = '/mnt/d/codetag/' + appid.upper() + '/V' + version + '/发布说明/' + appid + '_V_' + version + '版本发布计划.xlsx'
     else:
         fbFile = '/mnt/d/codetag/ifmis-spring-cloud4.0/' + appid.lower() + '/V' + version + '/发布说明/' + appid + '_V_' + version + '版本发布计划.xlsx'
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     wb.close()
 
     # 调整发布说明内容
-    if appid.upper() == "NFCS":
+    if appid.upper() == "NFCS" or appid.upper() == "ISA":
         fbFile = '/mnt/d/codetag/' + appid.upper() + '/V' + version + '/发布说明/产品发布说明模板.xlsx'
     else:
         fbFile = '/mnt/d/codetag/ifmis-spring-cloud4.0/' + appid.lower() + '/V' + version + '/发布说明/产品发布说明模板.xlsx'
@@ -68,6 +68,9 @@ if __name__ == '__main__':
     if appid.upper() == "NFCS":
         # 部署文件名 ifmis-pay-service-4.0.3.6-SNAPSHOT.jar
         sheet['E7'].value = "ifmis-data-center-{}-SNAPSHOT.jar".format(version.replace("_", "."))
+        sheet['E8'].value = ""
+    if appid.upper() == "ISA":
+        sheet['E7'].value = "ifmis-service-agent-{}-SNAPSHOT.jar".format(version.replace("_", "."))
         sheet['E8'].value = ""
     else:
         # 部署文件名 ifmis-pay-service-4.0.3.6-SNAPSHOT.jar
@@ -96,6 +99,9 @@ if __name__ == '__main__':
         if appid.upper() == "NFCS":
             sheet.cell(rowIndex + 3, 4, '人大联网监督系统')
             sheet.cell(rowIndex + 3, 5, '人大联网监督系统')
+        if appid.upper() == "ISA" :
+            sheet.cell(rowIndex + 3, 4, '单位端数据交换服务')
+            sheet.cell(rowIndex + 3, 5, '单位端数据交换服务')
         else:
             sheet.cell(rowIndex + 3, 4, '预算执行')
             if appid.upper() == "GFBI":

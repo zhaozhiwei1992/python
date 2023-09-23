@@ -60,7 +60,7 @@ def getFieldDataListFromJC():
         # 获取数据库中表定义信息
         # 这里查询字段要跟后边导入匹配上
         sql = (
-            "SELECT t.TABLE_NAME, t.column_name, t4.name AS col_comments, t.data_type, t.data_length, DECODE(t.nullable, 'Y', 'N', 'M') AS mo, DECODE(t.nullable, 'Y', '否', '是') AS required, t3.name as table_name_cn "
+            "SELECT t.TABLE_NAME, t.column_name, t4.name AS col_comments, t.data_type, CASE t.data_type WHEN 'NUMBER' THEN t.data_precision ELSE t.data_length end, DECODE(t.nullable, 'Y', 'N', 'M') AS mo, DECODE(t.nullable, 'Y', '否', '是') AS required, t3.name as table_name_cn "
             "FROM user_tab_cols t, user_col_comments t2, fasp_t_dictable t3, FASP_T_DICCOLUMN t4 WHERE t.table_name = t2.table_name (+) AND t.column_name = t2.column_name (+) AND t.table_name = t3.TABLECODE(+) AND t.table_name = t4.TABLECODE(+) AND t.COLUMN_NAME = t4.COLUMNCODE(+)")
         cursor.execute(sql)
         # 获取字段描述信息

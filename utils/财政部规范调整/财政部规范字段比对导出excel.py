@@ -22,6 +22,7 @@ port = 1521
 SID = 'ORCL'
 dsn = cx_Oracle.makedsn(ip, port, SID)
 
+
 def compareToExcel(tableV1, tableV2):
     """
     比较两个表数据, 分别生成表格变化, 列变化的excel
@@ -34,32 +35,35 @@ def compareToExcel(tableV1, tableV2):
         # 获取游标
         cursor = cx_Oracle.Cursor(connection)
         # v2版本增加的表
-        sql = "SELECT distinct table_name_cn, table_name FROM " + tableV2 + " t1 WHERE t1.table_name NOT IN (SELECT t2.table_name FROM " + tableV1+ " t2)"
+        sql = "SELECT distinct table_name_cn, table_name FROM " + tableV2 + " t1 WHERE t1.table_name NOT IN (SELECT t2.table_name FROM " + tableV1 + " t2) order by table_name asc"
         cursor.prepare(sql)
         cursor.execute(None)
         res = cursor.fetchall()
-        v2AddTableDataList=[]
+        v2AddTableDataList = []
         for result in res:
-            tableObj={}
+            tableObj = {}
             tableObj['table_name_cn'] = str(result[0])
             tableObj['table_name'] = str(result[1])
-            v2AddTableDataList.append(tableObj)
+            tableCode = str(result[1])
+            if tableCode.startswith("PAY_") or tableCode.startswith("GP_") or tableCode.startswith(
+                    "INC_") or tableCode.startswith("TAX_"):
+                    # or tableCode.startswith("ACCT_") or tableCode.startswith("GLF_")\
+                v2AddTableDataList.append(tableObj)
         print("新增的表: ", v2AddTableDataList)
-
 
         # v2版本删除的表
         # 如果跟集成库比对这个不准, 生成后删掉完事儿
-        sql = "SELECT distinct table_name_cn, table_name FROM " + tableV1 + " t1 WHERE t1.table_name NOT IN (SELECT t2.table_name FROM " + tableV2+ " t2)"
+        sql = "SELECT distinct table_name_cn, table_name FROM " + tableV1 + " t1 WHERE t1.table_name NOT IN (SELECT t2.table_name FROM " + tableV2 + " t2)"
         cursor.prepare(sql)
         cursor.execute(None)
         res = cursor.fetchall()
         v2DelTableDataList = []
         for result in res:
-            tableObj={}
+            tableObj = {}
             tableObj['table_name_cn'] = str(result[0])
             tableObj['table_name'] = str(result[1])
-            v2DelTableDataList.append(tableObj)
-
+            # v2DelTableDataList.append(tableObj)
+        # 跳过删除表
         print("删除的表: ", v2DelTableDataList)
 
         # 获取所有v1表信息, 包含中文及英文名称, v1存在的才能考虑字段变化
@@ -69,7 +73,7 @@ def compareToExcel(tableV1, tableV2):
         res = cursor.fetchall()
         fieldCompareTableList = []
         for result in res:
-            tableObj={}
+            tableObj = {}
             tableObj['table_name_cn'] = str(result[0])
             tableObj['table_name'] = str(result[1])
             fieldCompareTableList.append(tableObj)
@@ -95,7 +99,10 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['type'] = str(result[2])
                 fieldObj['length'] = str(result[3])
                 fieldObj['required'] = str(result[4])
-                addFieldList.append(fieldObj)
+
+                if tableName.startswith("PAY_") or tableName.startswith("GP_") or tableName.startswith(
+                        "INC_") or tableName.startswith("TAX_"):
+                    addFieldList.append(fieldObj)
 
             # v2->v1版本变更的列
             # 1.1 必填变更
@@ -117,7 +124,9 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['v2_type'] = str(result[5])
                 fieldObj['v2_length'] = str(result[6])
                 fieldObj['v2_required'] = str(result[7])
-                modFieldList.append(fieldObj)
+                if tableName.startswith("PAY_") or tableName.startswith("GP_") or tableName.startswith(
+                        "INC_") or tableName.startswith("TAX_"):
+                    modFieldList.append(fieldObj)
             # 1.2 长度变更
             sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required, t1.type as v2_type, t1.length as v2_length, t1.required as v2_required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.length <> t2.length"
             cursor.prepare(sql)
@@ -141,7 +150,9 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['v2_type'] = str(result[5])
                 fieldObj['v2_length'] = str(result[6])
                 fieldObj['v2_required'] = str(result[7])
-                modFieldList.append(fieldObj)
+                if tableName.startswith("PAY_") or tableName.startswith("GP_") or tableName.startswith(
+                        "INC_") or tableName.startswith("TAX_"):
+                    modFieldList.append(fieldObj)
             # 1.3 类型变更
             sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required, t1.type as v2_type, t1.length as v2_length, t1.required as v2_required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.type <> t2.type"
             cursor.prepare(sql)
@@ -169,7 +180,9 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['v2_type'] = str(result[5])
                 fieldObj['v2_length'] = str(result[6])
                 fieldObj['v2_required'] = str(result[7])
-                modFieldList.append(fieldObj)
+                if tableName.startswith("PAY_") or tableName.startswith("GP_") or tableName.startswith(
+                        "INC_") or tableName.startswith("TAX_"):
+                    modFieldList.append(fieldObj)
             # v2->v1版本删除的列
             # 跟集成库比对删除列无意义, excel中删掉即可
             sql = "SELECT col_code, col_name, type, length, required FROM " + tableV1 + " t1 WHERE t1.table_name = '" + tableName + "' AND t1.col_code NOT IN ( SELECT t2.col_code FROM " + tableV2 + " t2 WHERE t2.table_name = '" + tableName + "')"
@@ -220,7 +233,7 @@ def compareToExcel(tableV1, tableV2):
         sheet['D' + str(index + 2)].value = ele['operator']
         sheet['E' + str(index + 2)].value = ele['col_code']
         sheet['F' + str(index + 2)].value = ele['col_name']
-        sheet['G' + str(index + 2)].value = ele['type'] + "(" + ele['length']+ ")"
+        sheet['G' + str(index + 2)].value = ele['type'] + "(" + ele['length'] + ")"
         sheet['H' + str(index + 2)].value = ele['required']
 
     sheet = wb['v2版本修改的列']
@@ -231,7 +244,8 @@ def compareToExcel(tableV1, tableV2):
         sheet['D' + str(index + 2)].value = ele['operator']
         sheet['E' + str(index + 2)].value = ele['col_code']
         sheet['F' + str(index + 2)].value = ele['col_name']
-        sheet['G' + str(index + 2)].value = "V1: " + ele['type'] + "(" + ele['length']+ ")" + ", V2: " + ele['v2_type'] + "(" + ele['v2_length']+ ")"
+        sheet['G' + str(index + 2)].value = "V1: " + ele['type'] + "(" + ele['length'] + ")" + ", V2: " + ele[
+            'v2_type'] + "(" + ele['v2_length'] + ")"
         sheet['H' + str(index + 2)].value = "V1: " + ele['required'] + ", V2: " + ele['v2_required']
 
     sheet = wb['v2版本删除的列']
@@ -242,12 +256,15 @@ def compareToExcel(tableV1, tableV2):
         sheet['D' + str(index + 2)].value = ele['operator']
         sheet['E' + str(index + 2)].value = ele['col_code']
         sheet['F' + str(index + 2)].value = ele['col_name']
-        sheet['G' + str(index + 2)].value = ele['type'] + "(" + ele['length']+ ")"
+        sheet['G' + str(index + 2)].value = ele['type'] + "(" + ele['length'] + ")"
         sheet['H' + str(index + 2)].value = ele['required']
 
-    wb.save('/tmp/2.0规范表及字段变更明细.xlsx')
+    wb.save('/tmp/2.0规范表及字段变更明细-浙江.xlsx')
+
 
 if __name__ == '__main__':
-
     # 生成字段比对报告, 根据两个版本表比对
-    compareToExcel("STANDARD_FIELD_V1_JC20230505", "STANDARD_FIELD_V2_20230505")
+    # 全国
+    # compareToExcel("STANDARD_FIELD_V1_JC20230505", "STANDARD_FIELD_V2_20230505")
+    # 浙江
+    compareToExcel("STANDARD_FIELD_V1_ZJ20230918", "STANDARD_FIELD_V2_20230505")

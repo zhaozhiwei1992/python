@@ -1,7 +1,7 @@
 # !user/bin/python
 # _*_ coding: utf-8 _*_
 #
-# @Title: 财政部规范字段变更转升级脚本.py
+# @Title: 财政部规范字段变更转升级脚本-全国.py
 # @Description:
 # 根据整理的新规范字段变更excel, 转换为升级脚本
 # 转换源头有两种, 一种是通过excel格式解析生成sql
@@ -32,7 +32,7 @@ def createTable(tablename, tableNameCN, count):
     XXString: varchar2
     Text: clob
     Binary: clob
-    Currency: number(16, 2) 要带精度
+    Currency: number(20, 2) 要带精度
     Integer: number
     Time: VARCHAR2(18)
     Datetime: VARCHAR2(18)
@@ -59,7 +59,7 @@ def createTable(tablename, tableNameCN, count):
     # 字段信息
     con = cx_Oracle.connect('pay_34/1@192.168.100.80/orcl')
     cur = con.cursor()
-    sql = "select t.* from STANDARD_FIELD_V2_216 t where t.table_name = :table_name"
+    sql = "select t.* from STANDARD_FIELD_V2_20230505 t where t.table_name = :table_name"
     cur.prepare(sql)
     cur.execute(None, {'table_name': tablename})
     res = cur.fetchall()
@@ -79,7 +79,7 @@ def createTable(tablename, tableNameCN, count):
     insertSql = "insert into bus_t_Dictable (YEAR, PROVINCE, TABLECODE, NAME, REMARK, TABLETYPE, VERSION, DBTABNAME, " \
                 "APPID, EXP, TABLEPART, ISSHOW, DBIMPFLAG, ISSYS, ISUSES, VIEWTABLENAME, DBVERSION, DATASYNC, " \
                 "HASTRIGGER, SYNCCLASSNAME, STATUS)values ('2016', '87', '" + tablename + "', '" + tableNameCN + "', null, 1, " \
-                                                                                          "4, '" + tablename + "', 'gd', null, '0', 1, null, 1, 1, 'V_" + tablename \
+                                                                                          "4, '" + tablename + "', 'pay', null, '0', 1, null, 1, 1, 'V_" + tablename \
                 + "', null, null, null, null, '1'); "
     dicColumnsList.append(insertSql)
 
@@ -92,8 +92,11 @@ def createTable(tablename, tableNameCN, count):
         columnName = str(result[2])
         # 存储字段编码对照信息
         colCodeNameMap[columnCode] = columnName
+
+        # 不创建分区表临时注释
         if columnCode == "MOF_DIV_CODE":
             partationFlag = True
+
         # 类型要特殊处理
         columnType = str(result[3])
         # 是/否
@@ -104,9 +107,9 @@ def createTable(tablename, tableNameCN, count):
                 # integer类型转number
                 sqlList.append(columnCode + " number(" + str(result[4]) + ") " + requireStr)
             elif columnType.startswith("Currency"):
-                sqlList.append(columnCode + " number(16, 2) " + requireStr)
+                sqlList.append(columnCode + " number(20, 2) " + requireStr)
             elif columnType.startswith("Decimal"):
-                sqlList.append(columnCode + " number(16, 6) " + requireStr)
+                sqlList.append(columnCode + " number(20, 6) " + requireStr)
             elif columnType == "DateTime" or columnType == "Datetime" or columnType == "datetime" or columnType == "time":
                 sqlList.append(columnCode + " varchar2(18) " + requireStr)
             elif columnType == "date" or columnType == "Date":
@@ -120,9 +123,9 @@ def createTable(tablename, tableNameCN, count):
                 # integer类型转number
                 sqlList.append(columnCode + " number(" + str(result[4]) + ") " + requireStr + ", ")
             elif columnType.startswith("Currency"):
-                sqlList.append(columnCode + " number(16, 2) " + requireStr + ", ")
+                sqlList.append(columnCode + " number(20, 2) " + requireStr + ", ")
             elif columnType.startswith("Decimal"):
-                sqlList.append(columnCode + " number(16, 6) " + requireStr + ", ")
+                sqlList.append(columnCode + " number(20, 6) " + requireStr + ", ")
             elif columnType == "DateTime" or columnType == "Datetime" or columnType == "datetime" or columnType == "time":
                 sqlList.append(columnCode + " varchar2(18) " + requireStr + ", ")
             elif columnType == "date" or columnType == "Date":
@@ -187,7 +190,7 @@ def createTable(tablename, tableNameCN, count):
     # sqlList.append("end;")
 
     # 写入到文件中
-    fileName = "/tmp/gd/" + str(count).zfill(3) + "_" + tablename + "_create_zzw.sql"
+    fileName = "/tmp/sql/" + str(count).zfill(3) + "_" + tablename + "_create_zzw.sql"
 
     print("fileName", fileName)
     print("fileContent", "\r\n".join(sqlList))
@@ -200,7 +203,7 @@ def createTable(tablename, tableNameCN, count):
             writeFile.flush()
             writeFile.close()
 
-    dicFileName = "/tmp/gd/" + str(count).zfill(3) + "_dic_" + tablename + "_create_zzw.sql"
+    dicFileName = "/tmp/sql/" + str(count).zfill(3) + "_dic_" + tablename + "_create_zzw.sql"
 
     if not os.path.exists(dicFileName):
         writeFile = open(dicFileName, 'a')
@@ -252,14 +255,14 @@ def modifyTable(tableName, colList, count):
     ]
     colListGroupByOp = groupby(colList, itemgetter('op'))
     for key, group in colListGroupByOp:
-        if key == "新增字段":
+        if key == "新增列":
             for colMap in group:
                 # group是一个迭代器，包含了所有的分组列表
                 # print (key,g)
                 colCode = colMap["col_code"]
                 colType = str(colMap["col_type"])
                 #  colType转换
-                colType = transColType(colType)
+                colType = addColTransColType(colType)
                 colName = colMap["col_name"]
                 # default 0: 如果表里已经有数据, 不指定默认值，无法新增非空字段
                 requiredStr = " default 0 not null" if str(colMap["required"]) == "是" else ""
@@ -279,13 +282,15 @@ def modifyTable(tableName, colList, count):
                 dicColumnsList.append(delAndInsert[0])
                 dicColumnsList.append(delAndInsert[1])
 
-        elif key == "修改字段":
+        elif key == "必填变更" or key == "长度变更" or key == "类型变更":
             for colMap in group:
                 # group是一个迭代器，包含了所有的分组列表
                 # print (key,g)
                 colCode = colMap["col_code"]
+                if(colCode == "IS_DELETED"):
+                    continue
                 colType = colMap["col_type"]
-                colType = transColType(colType)
+                colType = modifyColTransColType(colType)
                 requiredStr = "default 0  not null" if str(colMap["required"]) == "是" else ""
                 # 构建脚本
                 sqlList.append(
@@ -300,7 +305,7 @@ def modifyTable(tableName, colList, count):
                 colCode = colMap["col_code"]
                 colType = str(colMap["col_type"])
                 #  colType转换
-                colType = transColType(colType)
+                colType = addColTransColType(colType)
                 colName = colMap["col_name"]
 
                 # 构建脚本
@@ -321,7 +326,7 @@ def modifyTable(tableName, colList, count):
     # 字段信息
     con = cx_Oracle.connect('pay_34/1@192.168.100.80/orcl')
     cur = con.cursor()
-    sql = "select t.* from STANDARD_FIELD_V2_216 t where t.table_name = :table_name and t.COL_CODE in (" \
+    sql = "select t.* from STANDARD_FIELD_V2_20230505 t where t.table_name = :table_name and t.COL_CODE in (" \
           "'MOF_DIV_CODE', 'FISCAL_YEAR') "
     cur.prepare(sql)
     cur.execute(None, {'table_name': str(tableName).upper()})
@@ -335,7 +340,7 @@ def modifyTable(tableName, colList, count):
                                            "global_multyear_cz.Secu_f_GLOBAL_PARM(''DIVID'')';")
 
     # 写入到文件中
-    fileName = "/tmp/gd/" + str(count).zfill(3) + "_" + tableName + "_modify_zzw.sql"
+    fileName = "/tmp/sql/" + str(count).zfill(3) + "_" + tableName + "_modify_zzw.sql"
 
     print("fileName", fileName)
     print("fileContent", "\r\n".join(sqlList))
@@ -348,7 +353,7 @@ def modifyTable(tableName, colList, count):
             writeFile.flush()
             writeFile.close()
 
-    dicFileName = "/tmp/gd/" + str(count).zfill(3) + "_dic_" + tableName + "_modify_zzw.sql"
+    dicFileName = "/tmp/sql/" + str(count).zfill(3) + "_dic_" + tableName + "_modify_zzw.sql"
 
     if not os.path.exists(dicFileName):
         writeFile = open(dicFileName, 'a')
@@ -359,18 +364,17 @@ def modifyTable(tableName, colList, count):
             writeFile.flush()
             writeFile.close()
 
-
-def transColType(colType):
+def addColTransColType(colType):
     """
-    字段类型转换, 财政部格式转oracle存储格式
+    新增字段类型转换, 财政部格式转oracle存储格式
     """
     if colType.startswith("Integer"):
         # integer类型转number
         colType = colType.replace("Integer", "number")
     elif colType.startswith("Currency"):
-        colType = "number(16, 2)"
+        colType = "number(20, 2)"
     elif colType.startswith("Decimal"):
-        colType = "number(16, 6)"
+        colType = "number(20, 6)"
     elif colType.startswith("DateTime") or colType.startswith("Datetime") or colType.startswith(
             "datetime") or colType.startswith("time"):
         colType = "varchar2(18)"
@@ -382,35 +386,82 @@ def transColType(colType):
         colType = "varchar2(" + colType.split("(")[1]
     return colType
 
+def modifyColTransColType(colType):
+    """
+    修改字段类型转换, 财政部格式转oracle存储格式
+    excel导出格式如: V1: VARCHAR2(7), V2: NString(11)
+    """
+    colType = colType[colType.find("V2:") + 4:]
+    if colType.startswith("Integer"):
+        # integer类型转number
+        colType = colType.replace("Integer", "number")
+    elif colType.startswith("Currency"):
+        colType = "number(20, 2)"
+    elif colType.startswith("Decimal"):
+        colType = "number(20, 6)"
+    elif colType.startswith("DateTime") or colType.startswith("Datetime") or colType.startswith(
+            "datetime") or colType.startswith("time"):
+        colType = "varchar2(18)"
+    elif colType.startswith("date") or colType.startswith("Date"):
+        colType = "varchar2(8)"
+    elif colType.startswith("Text") or colType.startswith("Binary"):
+        colType = "blob"
+    else:
+        colType = "varchar2(" + colType.split("(")[1]
+    return colType
 
 if __name__ == '__main__':
 
     # 创建脚本目录
-    sqlDir = '/tmp/gd/'
+    sqlDir = '/tmp/sql/'
     if not os.path.exists(sqlDir):
         os.mkdir(sqlDir)
 
-    # 1. excel准备好， 1为新增表, 2为字段变更
+    # 1. excel准备好， sheet页: v2版本增加的表 v2版本删除的表 v2版本增加的列 v2版本修改的列 v2版本删除的列
     # 2. 读取excel配置, 每个sheet分别处理, 新增表读取数据库配置创建表结构
-    wb = openpyxl.load_workbook('/tmp/收入-2.0表改造生成脚本数据.xlsx', False)
-    sheet = wb['sheet1']
+    wb = openpyxl.load_workbook('/tmp/2.0规范表及字段变更明细.xlsx', False)
+    sheet = wb['v2版本增加的表']
     # 获取table_name信息列表
-    count = 40
-    print('sheet1 Reading rows...')
+    # 生成脚本序号
+    count = 0
+    print('v2版本增加的表 Reading rows...')
     for row in range(2, len(tuple(sheet.rows)) + 1):
         #  获取表列数据
         table = sheet['B' + str(row)].value
         tableNameCN = sheet['C' + str(row)].value
         if table:
-            # 遍历生成创建表脚本001_xx表_create_zzw.sql, 写入/tmp/gd/下
+            # 遍历生成创建表脚本001_xx表_create_zzw.sql, 写入/tmp/sql/下
             count = count + 1
             createTable(table, tableNameCN, count)
 
-    # 获取第二个页签
-    sheet = wb['sheet2']
+    # 获取增加列页签
+    sheet = wb['v2版本增加的列']
     # 转换成列及类型长度等信息
-    print('sheet2 Reading rows...')
+    print('v2版本增加的列 Reading rows...')
     colList = []
+    for row in range(2, len(tuple(sheet.rows))):
+        # 表名
+        table = sheet['B' + str(row)].value
+        # 新增/修改/删除 字段
+        op = sheet['D' + str(row)].value
+        # 列名
+        colCode = sheet['E' + str(row)].value
+        colName = sheet['F' + str(row)].value
+        # 列类型
+        colType = sheet['G' + str(row)].value
+        # 必填
+        required = sheet['H' + str(row)].value
+
+        # 类型信息转换
+        # if str(colType).startswith("NString"):
+        #     pass
+        colList.append({"table_name": table, "col_code": colCode, "col_name": colName, "col_type": colType, "op": op,
+                        "required": required})
+
+    # 获取修改列页签
+    sheet = wb['v2版本修改的列']
+    # 转换成列及类型长度等信息
+    print('v2版本修改的列 Reading rows...')
     for row in range(2, len(tuple(sheet.rows))):
         # 表名
         table = sheet['B' + str(row)].value
