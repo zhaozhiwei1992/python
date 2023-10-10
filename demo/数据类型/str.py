@@ -56,3 +56,7 @@ print("最后一个字符", slice_str[-1:])
 
 colType = "V1: VARCHAR2(7), V2: NString(11)"
 print(colType[colType.find("V2:") + 4:])
+
+colType = "numeric(20, 2)"
+print(colType[:colType.find("(")])
+print(colType[colType.find("(") + 1:colType.find(",")])

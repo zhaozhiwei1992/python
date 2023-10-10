@@ -283,7 +283,7 @@ def modifyTable(tableName, colList, count):
                 dicColumnsList.append(delAndInsert[0])
                 dicColumnsList.append(delAndInsert[1])
 
-        elif key == "必填变更" or key == "长度变更" or key == "类型变更":
+        elif key == "必填变更" or key == "类型变更" or key == "长度变更":
             for colMap in group:
                 # group是一个迭代器，包含了所有的分组列表
                 # print (key,g)
@@ -292,15 +292,28 @@ def modifyTable(tableName, colList, count):
                     continue
                 colType = colMap["col_type"]
                 colType = modifyColTransColType(colType)
-                requiredStr = "default 0  not null" if str(colMap["required"]) == "是" else ""
                 # 构建脚本
                 sqlList.append(
                     "select count(1) into num  from user_tab_columns t where t.table_name = '" + tableName
                     + "' and t.COLUMN_NAME = '" + colCode + "';")
                 sqlList.append("if   num=1   then")
+                # 截取colType 拆分适配polardb函数
+                length = 0
+                if 'numeric' in colType:
+                    length = colType[colType.find("(") + 1:colType.find(",")]
+                    colType = colType[:colType.find("(")]
+                else:
+                    length = colType[colType.find("(") + 1:colType.find(")")]
+                    colType = colType[:colType.find("(")]
                 sqlList.append(
-                    "execute immediate 'ALTER TABLE " + tableName + " MODIFY " + colCode + " " + colType + " " + requiredStr + "';")
+                    # "execute immediate 'ALTER TABLE " + tableName + " MODIFY " + colCode + " " + colType + " " + requiredStr + "';")
+                    " select fn_altertablecol('" + tableName + "', '" + colCode + "', '" + colType + "', " + length + ") into num; \n"
+                    "if num = 0 then \n"
+                    "return; \n"
+                    "end if; \n"
+                    )
                 sqlList.append("end if;")
+
         elif key == "删除字段":
             for colMap in group:
                 colCode = colMap["col_code"]
@@ -333,12 +346,12 @@ def modifyTable(tableName, colList, count):
     cur.execute(None, {'table_name': str(tableName).upper()})
     res = cur.fetchall()
     if len(res) == 2:
-        sqlList.append("execute immediate'")
-        sqlList.append("create or replace view V_" + tableName + " as")
-        sqlList.append(
-            "select * from " + tableName + " t  where FISCAL_YEAR= global_multyear_cz. and "
-                                           "MOF_DIV_CODE = "
-                                           "global_multyear_cz.';")
+        sqlList.append("select fn_alterview('V_" + tableName + "', \n"
+                    "'create or replace view V_" + tableName + " as \n"
+                    "select * from " + tableName + " where province = global_multyear_cz.v_pmDivID and year = global_multyear_cz.v_pmYear ') into num; \n"
+                    "if num = 0 then \n"
+                    "return; \n"
+                    "end if; \n")
 
     # 写入到文件中
     fileName = "/tmp/sql/" + str(count).zfill(3) + "_" + tableName + "_modify_zzw.sql"
@@ -371,11 +384,11 @@ def addColTransColType(colType):
     """
     if colType.startswith("Integer"):
         # integer类型转number
-        colType = colType.replace("Integer", "number")
+        colType = colType.replace("Integer", "numeric")
     elif colType.startswith("Currency"):
-        colType = "number(20, 2)"
+        colType = "numeric(20, 2)"
     elif colType.startswith("Decimal"):
-        colType = "number(20, 6)"
+        colType = "numeric(20, 6)"
     elif colType.startswith("DateTime") or colType.startswith("Datetime") or colType.startswith(
             "datetime") or colType.startswith("time"):
         colType = "varchar2(18)"
@@ -395,11 +408,11 @@ def modifyColTransColType(colType):
     colType = colType[colType.find("V2:") + 4:]
     if colType.startswith("Integer"):
         # integer类型转number
-        colType = colType.replace("Integer", "number")
+        colType = colType.replace("Integer", "numeric")
     elif colType.startswith("Currency"):
-        colType = "number(20, 2)"
+        colType = "numeric(20, 2)"
     elif colType.startswith("Decimal"):
-        colType = "number(20, 6)"
+        colType = "numeric(20, 6)"
     elif colType.startswith("DateTime") or colType.startswith("Datetime") or colType.startswith(
             "datetime") or colType.startswith("time"):
         colType = "varchar2(18)"
@@ -420,7 +433,7 @@ if __name__ == '__main__':
 
     # 1. excel准备好， sheet页: v2版本增加的表 v2版本删除的表 v2版本增加的列 v2版本修改的列 v2版本删除的列
     # 2. 读取excel配置, 每个sheet分别处理, 新增表读取数据库配置创建表结构
-    wb = openpyxl.load_workbook('/tmp/2.0规范表及字段变更明细.xlsx', False)
+    wb = openpyxl.load_workbook('/tmp/2.0规范表及字段变更明细-浙江.xlsx', False)
     sheet = wb['v2版本增加的表']
     # 获取table_name信息列表
     # 生成脚本序号
