@@ -67,7 +67,7 @@ def compareToExcel(tableV1, tableV2):
         print("删除的表: ", v2DelTableDataList)
 
         # 获取所有v1表信息, 包含中文及英文名称, v1存在的才能考虑字段变化
-        sql = "SELECT distinct table_name_cn, table_name FROM " + tableV1
+        sql = "SELECT distinct table_name_cn, table_name FROM " + tableV1 + " where substr(table_name, 0,2) <> 'V_' order by table_name asc"
         cursor.prepare(sql)
         cursor.execute(None)
         res = cursor.fetchall()
@@ -77,6 +77,8 @@ def compareToExcel(tableV1, tableV2):
             tableObj['table_name_cn'] = str(result[0])
             tableObj['table_name'] = str(result[1])
             fieldCompareTableList.append(tableObj)
+
+        # print('所有的表 ', fieldCompareTableList)
 
         addFieldList = []
         delFieldList = []
@@ -134,9 +136,9 @@ def compareToExcel(tableV1, tableV2):
             res = cursor.fetchall()
             for result in res:
                 # 金额的变化跳过, 基本是要按照一体化字段来处理 Currency
-                # 日期的也跳过, 一体化为准
-                if str(result[5]) in ["Currency", "Date", "DateTime"]:
-                    continue
+                # 日期的也跳过, 一体化为准, (不能跳过, 否则可能出现精度变化而丢失, 生成脚本时会处理)
+                # if str(result[5]) in ["Currency", "Date", "DateTime"]:
+                #     continue
                 fieldObj = {}
                 fieldObj['table_name'] = tableName
                 fieldObj['table_name_cn'] = tableCName
@@ -263,12 +265,12 @@ def compareToExcel(tableV1, tableV2):
         sheet['G' + str(index + 2)].value = ele['type'] + "(" + ele['length'] + ")"
         sheet['H' + str(index + 2)].value = ele['required']
 
-    wb.save('/tmp/2.0规范表及字段变更明细-全国.xlsx')
+    wb.save('/tmp/2.0规范表及字段变更明细-浙江.xlsx')
 
 
 if __name__ == '__main__':
     # 生成字段比对报告, 根据两个版本表比对
     # 全国
-    compareToExcel("STANDARD_FIELD_V1_JC20230505", "STANDARD_FIELD_V2_20230505")
+    # compareToExcel("STANDARD_FIELD_V1_JC20230505", "STANDARD_FIELD_V2_20230505")
     # 浙江
-    # compareToExcel("STANDARD_FIELD_V1_ZJ20230918", "STANDARD_FIELD_V2_20230505")
+    compareToExcel("STANDARD_FIELD_V1_ZJ20230918", "STANDARD_FIELD_V2_20230505")

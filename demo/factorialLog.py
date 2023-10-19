@@ -1,6 +1,8 @@
 import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.debug('Start of program')
+# 使用下述代码禁用日志输出
+# logging.disable(logging.DEBUG)
 
 def factorial(n):
     logging.debug('Start of factorial(%s%%)' % (n))

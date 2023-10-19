@@ -46,7 +46,7 @@ def createTable(tablename, tableNameCN, count):
         # "declare",
         "   num number;",
         "begin",
-        "select count(1) into num from user_constraints t where t.table_name = '" + tablename + "';",
+        "select count(1) into num from user_constraints t where t.table_name = '" + tablename + "' AND CONSTRAINT_NAME = 'PK_" + viewname + "';",
         "if num > 0 then",
         "execute immediate 'alter table " + tablename + " drop constraint PK_" + viewname + " cascade drop index';",
         "end if;",
@@ -109,8 +109,13 @@ def createTable(tablename, tableNameCN, count):
             elif columnType.startswith("Currency"):
                 sqlList.append(columnCode + " number(20, 2) " + requireStr)
             elif columnType.startswith("Decimal"):
-                sqlList.append(columnCode + " number(20, 6) " + requireStr)
-            elif columnType == "DateTime" or columnType == "Datetime" or columnType == "datetime" or columnType == "time":
+                colLength = columnType[columnType.find("Decimal") + 7:]
+                if "," in colLength:
+                    columnType = "number" + colLength
+                else:
+                    columnType = "number(18, 8)"
+                sqlList.append(columnCode + columnType + requireStr)
+            elif columnType == "DateTime" or columnType == "Datetime" or columnType == "Time" or columnType == "datetime" or columnType == "time":
                 sqlList.append(columnCode + " varchar2(18) " + requireStr)
             elif columnType == "date" or columnType == "Date":
                 sqlList.append(columnCode + " varchar2(8) " + requireStr)
@@ -125,8 +130,13 @@ def createTable(tablename, tableNameCN, count):
             elif columnType.startswith("Currency"):
                 sqlList.append(columnCode + " number(20, 2) " + requireStr + ", ")
             elif columnType.startswith("Decimal"):
-                sqlList.append(columnCode + " number(20, 6) " + requireStr + ", ")
-            elif columnType == "DateTime" or columnType == "Datetime" or columnType == "datetime" or columnType == "time":
+                colLength = columnType[columnType.find("Decimal") + 7:]
+                if "," in colLength:
+                    columnType = "number" + colLength
+                else:
+                    columnType = "number(18, 8)"
+                sqlList.append(columnCode + columnType + requireStr)
+            elif columnType == "DateTime" or columnType == "Datetime" or columnType == "Time" or columnType == "datetime" or columnType == "time":
                 sqlList.append(columnCode + " varchar2(18) " + requireStr + ", ")
             elif columnType == "date" or columnType == "Date":
                 sqlList.append(columnCode + " varchar2(8) " + requireStr + ", ")
@@ -281,8 +291,36 @@ def modifyTable(tableName, colList, count):
                 delAndInsert = dicColumns(tableName, colCode, colType, colName)
                 dicColumnsList.append(delAndInsert[0])
                 dicColumnsList.append(delAndInsert[1])
+        elif key == "必填变更" :
+            for colMap in group:
+                # group是一个迭代器，包含了所有的分组列表
+                # print (key,g)
+                colCode = colMap["col_code"]
+                if(colCode == "IS_DELETED"):
+                    continue
+                requiredStr = str(colMap["required"])
+                requiredStr = requiredStr[requiredStr.find("V2:") + 4:]
+                if requiredStr == "是":
+                    # 构建脚本
+                    sqlList.append(
+                        "select count(1) into num  from user_tab_columns t where t.table_name = '" + tableName
+                        + "' and t.COLUMN_NAME = '" + colCode + "' AND NULLABLE = 'Y';")
+                    sqlList.append("if   num=1   then")
+                    sqlList.append("execute immediate 'UPDATE " + tableName + " SET " + colCode + " = ''0'' WHERE " + colCode + " IS NULL';")
+                    sqlList.append(
+                        "execute immediate 'ALTER TABLE " + tableName + " MODIFY " + colCode + " not null';")
+                    sqlList.append("end if;")
+                elif requiredStr == "否":
+                    # 构建脚本
+                    sqlList.append(
+                        "select count(1) into num  from user_tab_columns t where t.table_name = '" + tableName
+                        + "' and t.COLUMN_NAME = '" + colCode + "' AND NULLABLE = 'N';")
+                    sqlList.append("if   num=1   then")
+                    sqlList.append(
+                        "execute immediate 'ALTER TABLE " + tableName + " MODIFY " + colCode + " null';")
+                    sqlList.append("end if;")
 
-        elif key == "必填变更" or key == "长度变更" or key == "类型变更":
+        elif key == "长度变更" or key == "类型变更":
             for colMap in group:
                 # group是一个迭代器，包含了所有的分组列表
                 # print (key,g)
@@ -291,15 +329,15 @@ def modifyTable(tableName, colList, count):
                     continue
                 colType = colMap["col_type"]
                 colType = modifyColTransColType(colType)
-                requiredStr = "default 0  not null" if str(colMap["required"]) == "是" else ""
                 # 构建脚本
                 sqlList.append(
                     "select count(1) into num  from user_tab_columns t where t.table_name = '" + tableName
                     + "' and t.COLUMN_NAME = '" + colCode + "';")
                 sqlList.append("if   num=1   then")
                 sqlList.append(
-                    "execute immediate 'ALTER TABLE " + tableName + " MODIFY " + colCode + " " + colType + " " + requiredStr + "';")
+                    "execute immediate 'ALTER TABLE " + tableName + " MODIFY " + colCode + " " + colType + "';")
                 sqlList.append("end if;")
+
         elif key == "删除字段":
             for colMap in group:
                 colCode = colMap["col_code"]
@@ -374,8 +412,13 @@ def addColTransColType(colType):
     elif colType.startswith("Currency"):
         colType = "number(20, 2)"
     elif colType.startswith("Decimal"):
-        colType = "number(20, 6)"
-    elif colType.startswith("DateTime") or colType.startswith("Datetime") or colType.startswith(
+        # 截取实际类型，没有的指定为18,8 Decimal(18,8)
+        colLength = colType[colType.find("Decimal") + 7:]
+        if "," in colLength:
+            colType = "number" + colLength
+        else:
+            colType = "number(18, 8)"
+    elif colType.startswith("DateTime") or colType.startswith("Datetime") or colType.startswith("Time") or colType.startswith(
             "datetime") or colType.startswith("time"):
         colType = "varchar2(18)"
     elif colType.startswith("date") or colType.startswith("Date"):
@@ -398,8 +441,12 @@ def modifyColTransColType(colType):
     elif colType.startswith("Currency"):
         colType = "number(20, 2)"
     elif colType.startswith("Decimal"):
-        colType = "number(20, 6)"
-    elif colType.startswith("DateTime") or colType.startswith("Datetime") or colType.startswith(
+        colLength = colType[colType.find("Decimal") + 7:]
+        if "," in colLength:
+            colType = "number" + colLength
+        else:
+            colType = "number(18, 8)"
+    elif colType.startswith("DateTime") or colType.startswith("Datetime") or colType.startswith("Time") or colType.startswith(
             "datetime") or colType.startswith("time"):
         colType = "varchar2(18)"
     elif colType.startswith("date") or colType.startswith("Date"):
@@ -419,7 +466,7 @@ if __name__ == '__main__':
 
     # 1. excel准备好， sheet页: v2版本增加的表 v2版本删除的表 v2版本增加的列 v2版本修改的列 v2版本删除的列
     # 2. 读取excel配置, 每个sheet分别处理, 新增表读取数据库配置创建表结构
-    wb = openpyxl.load_workbook('/tmp/2.0规范表及字段变更明细.xlsx', False)
+    wb = openpyxl.load_workbook('/tmp/2.0规范表及字段变更明细-全国.xlsx', False)
     sheet = wb['v2版本增加的表']
     # 获取table_name信息列表
     # 生成脚本序号
@@ -439,7 +486,7 @@ if __name__ == '__main__':
     # 转换成列及类型长度等信息
     print('v2版本增加的列 Reading rows...')
     colList = []
-    for row in range(2, len(tuple(sheet.rows))):
+    for row in range(2, len(tuple(sheet.rows)) + 1):
         # 表名
         table = sheet['B' + str(row)].value
         # 新增/修改/删除 字段
@@ -462,7 +509,7 @@ if __name__ == '__main__':
     sheet = wb['v2版本修改的列']
     # 转换成列及类型长度等信息
     print('v2版本修改的列 Reading rows...')
-    for row in range(2, len(tuple(sheet.rows))):
+    for row in range(2, len(tuple(sheet.rows)) + 1):
         # 表名
         table = sheet['B' + str(row)].value
         # 新增/修改/删除 字段

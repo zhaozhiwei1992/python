@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # 遍历表信息
     try:
         # 读取数据
-        readFile = open('tables.txt', 'r')  # r只读，w可写，a追加
+        readFile = open('../tables.txt', 'r')  # r只读，w可写，a追加
         while True:
             line = readFile.readline()
             if len(line) == 0:
