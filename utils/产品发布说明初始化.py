@@ -3,6 +3,8 @@ import sys
 
 import openpyxl
 
+import 项目.获取发版内容org as fborg
+
 """
 每个版本执行一次, 初始化
 
@@ -32,8 +34,12 @@ if __name__ == '__main__':
         fbFile = '/mnt/d/codetag/' + appid.upper() + '/V' + version + '/发布说明/' + appid + '_V_' + version + '版本发布计划.xlsx'
     else:
         fbFile = '/mnt/d/codetag/ifmis-spring-cloud4.0/' + appid.lower() + '/V' + version + '/发布说明/' + appid + '_V_' + version + '版本发布计划.xlsx'
+        # 临时测试
+        # fbFile = '/tmp/' + appid + '_V_' + version + '版本发布计划.xlsx'
     wb = openpyxl.load_workbook(fbFile, False)
     sheet = wb['版本发布计划']
+    # 系统名称
+    appName = sheet['C4'].value
 
     print('Reading 版本发布计划 rows...')
     allRows = []
@@ -53,14 +59,20 @@ if __name__ == '__main__':
         fbFile = '/mnt/d/codetag/' + appid.upper() + '/V' + version + '/发布说明/产品发布说明模板.xlsx'
     else:
         fbFile = '/mnt/d/codetag/ifmis-spring-cloud4.0/' + appid.lower() + '/V' + version + '/发布说明/产品发布说明模板.xlsx'
+        # fbFile = '/tmp/产品发布说明模板.xlsx'
     wb = openpyxl.load_workbook(fbFile, False)
     sheet = wb['01_发版说明']
     # 修改版本信息等
     # 产品标识
     sheet['F2'].value = appid
+    sheet['C2'].value = appName
     # 发布日期
     sheet['H2'].value = "{}月{}日".format(month, day)
-    sheet['H14'].value = "{}月{}日".format(month, day)
+    sheet['H15'].value = "{}月{}日".format(month, day)
+
+    #系统名称
+    sheet['B7'].value = appName + '后端'
+    sheet['B8'].value = appName + '前端'
 
     # 系统版本号
     sheet['C7'].value = version.replace("_", ".")
@@ -80,6 +92,14 @@ if __name__ == '__main__':
     sheet['G7'].value = version.replace("_", ".")
     sheet['G8'].value = version.replace("_", ".")
 
+    # 读取依赖信息, 需要读取org文件
+    fbContentMap = fborg.find(appid.upper(), 'V_' + version)
+    deptList = fbContentMap.get("dept")
+    for rowIndex in range(0, len(deptList)):
+        deptTuple = deptList[rowIndex]
+        sheet['B' + str(12 + rowIndex)].value = deptTuple[0]
+        sheet['E' + str(12 + rowIndex)].value = deptTuple[1]
+
     # 02_发版测试
     sheet = wb['02_发版测试']
     sheet['F2'].value = "{}月{}日".format(month, day)
@@ -96,20 +116,11 @@ if __name__ == '__main__':
         sheet.cell(rowIndex + 3, 2,
                    '问题' if srcId is not None and str(srcId).__contains__("#") else '需求')
         sheet.cell(rowIndex + 3, 3, rowIndex + 1)
-        if appid.upper() == "NFCS":
-            sheet.cell(rowIndex + 3, 4, '人大联网监督系统')
-            sheet.cell(rowIndex + 3, 5, '人大联网监督系统')
-        if appid.upper() == "ISA" :
-            sheet.cell(rowIndex + 3, 4, '单位端数据交换服务')
-            sheet.cell(rowIndex + 3, 5, '单位端数据交换服务')
-        else:
-            sheet.cell(rowIndex + 3, 4, '预算执行')
-            if appid.upper() == "GFBI":
-                sheet.cell(rowIndex + 3, 5, '预算执行报表')
-            else:
-                sheet.cell(rowIndex + 3, 5, '集中支付')
+        sheet.cell(rowIndex + 3, 4, '预算执行')
+        sheet.cell(rowIndex + 3, 5, appName)
         sheet.cell(rowIndex + 3, 6, rowData['content'])
         sheet.cell(rowIndex + 3, 7, rowData['srcId'])
 
     # 保存
     wb.save(fbFile)
+

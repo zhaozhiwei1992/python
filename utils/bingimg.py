@@ -75,7 +75,7 @@ def get_img_url(raw_img_url="https://area.sinaapp.com/bingImg/"):
     """
     response = requests.get(raw_img_url)
     responseObj = json.loads(response.text)
-    img_url='https://cn.bing.com'+responseObj['images'][0]['url']
+    img_url = 'https://cn.bing.com' + responseObj['images'][0]['url']
     # img_url = response.url  # 得到图片文件的网址
     # print('img_url:', img_url)
     return img_url
@@ -86,8 +86,8 @@ def set_img_as_wallpaper(filepath):
     pass
     # ctypes.windll.user32.SystemParametersInfoW(20, 0, filepath, 0)
 
+
 if __name__ == "__main__":
     dirname = os.environ['HOME'] + "/Pictures/bingImg"  # 图片要被保存在的位置
     img_url = get_img_url('https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN')
     filepath = save_img(img_url, dirname)  # 图片文件的的路径
-

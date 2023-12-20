@@ -5,6 +5,9 @@ import openpyxl
 
 import sys
 
+import 项目.一堆配置 as cfg
+import 项目.获取发版内容org as fborg
+
 """
 每个版本执行一次, 初始化
 
@@ -42,51 +45,19 @@ if __name__ == '__main__':
     sheet['E4'].value = version
     sheet['E5'].value = "{}/{}/{}".format(year, month, daysOfMonth)
 
-    # 填充发版计划内容
-    srcFile = "/home/zhaozhiwei/workspace/项目管理/发版计划/"
-    # 查询版本开始的内容, 循环填充
-    if "GFBI" == appid:
-        sheet['C4'].value = "预算执行报表系统"
-        srcFile += "预算执行报表发版计划.org"
-    elif "PAY" == appid:
-        sheet['C4'].value = "支付系统"
-        srcFile += "支付发版计划.org"
-    elif "PAYZJ" == appid:
-        sheet['C4'].value = "支付系统"
-        srcFile += "浙江支付发版计划.org"
-    elif "NFCS" == appid:
-        sheet['C4'].value = "人大监督联网融合中心"
-        srcFile += "人大监督联网融合中心发版计划.org"
-    elif "ISA" == appid:
-        sheet['C4'].value = "单位端数据交换服务"
-        srcFile += "单位端数据交换服务发版计划.org"
+    sheet['C4'].value = cfg.APPID_NAME_MAP.get(appid)
 
-    f = open(srcFile)
-    # 一次读取所有行
-    fileContentList = f.readlines()
-
-    startRow = 8
-    flag = 0
-    for lineContent in fileContentList:
-        # 如果找到这个版本，则准备开始写入数据, 找到需要1开始的
-        # 发版计划org文件里增加了发版邮件等工具, 里面也包含版本号, 防止错误数据, 只找版本在标题上的
-        if version.replace("V_", "* ") in lineContent:
-            flag = 1
-        if flag == 1 and "发布内容" in lineContent:
-            flag = 2
-        if flag == 2:
-            # 开始写入
-            # 第9行开始, C:内容 D:禅道编号, 空格分隔
-            rowArray = lineContent.split(" ")
-            if (len(rowArray)) == 3:
-                # 没有禅道号的, 人员|内容
-                sheet['C' + str(startRow)].value = rowArray[1] + "|" + rowArray[2]
-            elif len(rowArray) > 3:
-                # 人员|内容
-                sheet['C' + str(startRow)].value = rowArray[2] + "|" + rowArray[3]
-                # 禅道号
-                sheet['D' + str(startRow)].value = rowArray[1]
-            startRow = startRow+1
+    startRow = 9
+    fbContentMap = fborg.find(appid, version)
+    contentList = fbContentMap.get("content")
+    # 开始写入
+    # 第9行开始, C:内容 D:禅道编号, 空格分隔
+    for rowIndex in range(0, len(contentList)):
+        contentTuple = contentList[rowIndex]
+        # 人员|内容
+        sheet['C' + str(startRow + rowIndex)].value = contentTuple[0]
+        # 禅道号
+        sheet['D' + str(startRow + rowIndex)].value = contentTuple[1]
 
     # 可以另存多个
     wb.save('/tmp/{}_{}版本发布计划.xlsx'.format(appid, version))
