@@ -16,181 +16,150 @@ linux下需要使用管理员身份运行(触发按键需要), 否则运行报�
 sudo python xx.py
 
 """
+
 import pygame
-# 键盘
 import keyboard
 import pyautogui
+import configparser
 import time
 
-# 鼠标, 没啥用了
-# from pymouse import PyMouseMeta
-# m = PyMouseMeta()
 
+class JoyToKeyMouse:
+    def __init__(self, key_mapping, mouse_speed):
+        self.key_mapping = key_mapping
+        self.mouse_speed = mouse_speed
+        self.last_joystick_event_time = 0
+        self.joystick_event_interval = 0.1  # 设置摇杆事件的间隔阈值
+        self.joystick_release_threshold = 0.2  # 设置摇杆释放的阈值,解决释放后还连续触发
 
-class JoyToKey:
-    """
-    将手柄映射到键盘输入上
-    """
+        # 初始化pygame
+        pygame.init()
+        pygame.joystick.init()
 
-    def exec(self, joystick, event):
-        #	可能的joystick行为: JOYAXISMOTION JOYBALLMOTION JOYBUTTONDOWN JOYBUTTONUP JOYHATMOTION
-        # if event.type == pygame.JOYBUTTONUP:
-        #     print("Joystick button released.")
-        # ********************键盘按键********************
-        if event.type == pygame.KEYDOWN:
-            # print(pygame.key.get_pressed())
-            pass
-            # event.key 表示键盘按键的值，比如k 的值是107， 回车键的值是13，等
-            # self.toggle_show_fps(event.key)
-        elif event.type == pygame.KEYUP:
-            # print(pygame.key.get_pressed())
-            pass
+        # 初始化手柄
+        joystick_count = pygame.joystick.get_count()
+        print("Number of joysticks: {}".format(joystick_count))
+        if joystick_count < 1:
+            raise RuntimeError("No joystick detected.")
+        self.joystick = pygame.joystick.Joystick(0)
+        self.joystick.init()
 
-        # ********************手柄操作********************
+        # 初始化屏幕
+        # self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        # pygame.display.set_caption("JoyToKeyMouse")
+
+    def handle_event(self, event):
+        if event.type == pygame.QUIT:
+            return True
         elif event.type == pygame.JOYBUTTONDOWN:
-            # 检测到手柄上的键按下
-            # print("Joystick button pressed.")
-            if joystick.get_button(7) == 1:
-                # 手柄start键 --> 键盘中的回车键。
-                keyboard.press('enter')
-            if joystick.get_button(0) == 1:
-                # 手柄A键 --> 键盘的k键，也就是对应跳(闪)的功能。
-                keyboard.press('k')
-            if joystick.get_button(2) == 1:
-                # 手柄X键 --> 键盘u
-                keyboard.press('u')
-            if joystick.get_button(1) == 1:
-                # 手柄B键 --> 键盘i
-                keyboard.press('i')
-            if joystick.get_button(3) == 1:
-                # 手柄Y键 --> 键盘p
-                keyboard.press('p')
-            if joystick.get_button(4) == 1:
-                keyboard.press('h')
-            if joystick.get_button(5) == 1:
-                # 手柄又键 --> 键盘l(换武器)
-                # keyboard.press('l')
-                keyboard.press('j')
+            button = str(event.button)
+            if button in self.key_mapping:
+                print("按钮 {}, 映射 {}".format(button, self.key_mapping[button]))
+                keyboard.press(self.key_mapping[button])
         elif event.type == pygame.JOYBUTTONUP:
-            # print("Joystick button release.")
-            if joystick.get_button(7) == 0:
-                # 手柄start键 --> 键盘中的回车键。
-                keyboard.release('enter')
-            if joystick.get_button(0) == 0:
-                # 手柄A键 --> 键盘的k键，也就是对应跳(闪)的功能。
-                keyboard.release('k')
-            if joystick.get_button(2) == 0:
-                # 手柄X键 --> 键盘u
-                keyboard.release('u')
-            if joystick.get_button(1) == 0:
-                # 手柄B键 --> 键盘i
-                keyboard.release('i')
-            if joystick.get_button(3) == 0:
-                # 手柄Y键 --> 键盘p
-                keyboard.release('p')
-            if joystick.get_button(4) == 0:
-                keyboard.release('h')
-            if joystick.get_button(5) == 0:
-                # 手柄又键 --> 键盘l(换武器)
-                # keyboard.release('l')
-                # 攻击键容易连点
-                keyboard.release('j')
-
-        # 攻击键
+            button = str(event.button)
+            if button in self.key_mapping:
+                print("按钮 {}, 映射 {}".format(button, self.key_mapping[button]))
+                keyboard.release(self.key_mapping[button])
         elif event.type == pygame.JOYAXISMOTION:
-            # print("Joystick axis pressed.")
-            if joystick.get_axis(2) > 0:
-                # 手柄左x --> 键盘h
-                # 注意: 这里需要让手柄, pygame来控制按压和释放, 如果用pyautogui, keydown每次会触发很多按压,(连点)
-                # 还是用这个保险
-                #keyboard.press('h')
-            if joystick.get_axis(5) > 0:
-                # 手柄右x --> 键盘j
-                # 用按键控制, 防止连击
-                #keyboard.press('j')
-            if round(joystick.get_axis(1)) < 0:
-                # 前
-                keyboard.press('w')
-            if round(joystick.get_axis(1)) > 0:
-                # 后
-                keyboard.press('s')
-            if round(joystick.get_axis(0)) < 0:
-                # 左
-                keyboard.press('a')
-            if round(joystick.get_axis(0)) > 0:
-                # 右
-                keyboard.press('d')
+            axis = event.axis
+            value = event.value
+            # 计算时间间隔
+            current_time = time.time()
+            time_diff = current_time - self.last_joystick_event_time
 
-            # 释放
-            # print("Joystick axis released.")
-            # print("s", joystick.get_axis(1))
-            if joystick.get_axis(2) < 0:
-                # 手柄左x --> 键盘h
-                #keyboard.release('h')
-            if joystick.get_axis(5) < 0:
-                # 手柄右x --> 键盘j
-                #keyboard.release('j')
-            if round(joystick.get_axis(0)) == 0:
-                # 释放左右
-                keyboard.release('a')
-                keyboard.release('d')
-            if round(joystick.get_axis(1)) == 0:
-                # 释放前后
-                keyboard.release('w')
-                keyboard.release('s')
+            # 如果事件间隔小于阈值，则忽略此次摇杆事件
+            if time_diff < self.joystick_event_interval:
+                return False
+            if str(axis) in self.key_mapping:
+                print('摇杆有毛个映射,别瞎写')
+                # if value > 0:
+                #     keyboard.press(self.key_mapping[axis])
+                # else:
+                #     keyboard.release(self.key_mapping[axis])
+            if axis == 0 or axis == 1:
+                # 获取左摇杆的坐标
+                left_stick_x = self.joystick.get_axis(0)
+                left_stick_y = self.joystick.get_axis(1)
 
-            # 摇杆转向
-            # 当前鼠标光标位置, 固定位置, 不单独获取了
-            # x, y = pygame.mouse.get_pos()
-            x, y = 482, 305
-            pyautogui.moveTo(x, y)
-            # 1. 设置当前鼠标光标位置, 放中间或偏右
-            # 2. 根据摇杆变化, 利用pyautogui进行拖拽
-            # 3, 4为遥感的横/纵向变化
-            if joystick.get_axis(3) != 0 or joystick.get_axis(4) != 0:
-                # 将当前光标位置的东西向下移动100个像素点，在拖动的过程中按住鼠标左键。
-                # >> > pyautogui.drag(100, 0, button='left')
-                # 一样的问题, 连点
-                # pyautogui.drag(int(round(joystick.get_axis(4))), int(round(joystick.get_axis(3))), button='left')
-                print(y+int(round(joystick.get_axis(4))), x+int(round(joystick.get_axis(3))))
+                # 计算鼠标的移动增量
+                mouse_dx = left_stick_x * self.mouse_speed
+                mouse_dy = left_stick_y * self.mouse_speed
 
-                # 使用pymouse实现上述payautogui的拖拽
-                # x, y = pygame.mouse.get_pos()
-                # m.press(x, y)
-                # x1 = x + joystick.get_axis(3)
-                # y1 = y + joystick.get_axis(4)
-                # m.move(x1, y1)
-                # m.release(x1, y1)
+                # 获取当前鼠标位置
+                mouse_x, mouse_y = pyautogui.position()
+
+                # 计算新的鼠标位置
+                new_mouse_x = max(0, min(pyautogui.size()[0], mouse_x + mouse_dx))
+                new_mouse_y = max(0, min(pyautogui.size()[1], mouse_y + mouse_dy))
+
+                # 右摇杆X轴方向
+                if value > 0:
+                    # 模拟鼠标左键按下
+                    pyautogui.mouseDown(button='left')
+                else:
+                    # 模拟鼠标左键释放
+                    pyautogui.mouseUp(button='left')
+                # 移动鼠标
+                pyautogui.moveTo(new_mouse_x, new_mouse_y)
+            # 更新上一次摇杆事件处理时间戳
+            self.last_joystick_event_time = current_time
+            if abs(self.joystick.get_axis(0)) < self.joystick_release_threshold and abs(
+                    self.joystick.get_axis(1)) < self.joystick_release_threshold:
+                # 摇杆已经释放，重置上次摇杆事件处理时间戳
+                self.last_joystick_event_time = 0
+        elif event.type == pygame.JOYHATMOTION:
+            hat_x, hat_y = event.value
+            if hat_x == -1:
+                print('向左移动')
+                keyboard.press(self.key_mapping['LEFT'])
+            elif hat_x == 1:
+                print('向右移动')
+                keyboard.press(self.key_mapping['RIGHT'])
+            else:
+                keyboard.release(self.key_mapping['LEFT'])
+                keyboard.release(self.key_mapping['RIGHT'])
+            if hat_y == -1:
+                print('向后移动')
+                keyboard.press(self.key_mapping['DOWN'])
+            elif hat_y == 1:
+                print('向前移动')
+                keyboard.press(self.key_mapping['UP'])
+            else:
+                keyboard.release(self.key_mapping['UP'])
+                keyboard.release(self.key_mapping['DOWN'])
+        return False
+
+
+def load_key_mapping(mapping_file):
+    key_mapping = {}
+    with open(mapping_file, 'r') as file:
+        for line in file:
+            button, key = line.strip().split(',')
+            # key要去掉注释部分
+            key_mapping[button] = key.split('#')[0].strip()
+    return key_mapping
+
+
+def load_config(config_file):
+    config = configparser.ConfigParser()
+    config.read(config_file)
+    mouse_speed = int(config['MOUSE']['speed'])
+    return mouse_speed
+
+
+def main():
+    key_mapping = load_key_mapping('/home/zhaozhiwei/workspace/python/utils/游戏手柄按键适配/key_mapping.txt')
+    mouse_speed = load_config('/home/zhaozhiwei/workspace/python/utils/游戏手柄按键适配/config.ini')
+    joy_to_key_mouse = JoyToKeyMouse(key_mapping, mouse_speed)
+
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            done = joy_to_key_mouse.handle_event(event)
+
+    pygame.quit()
 
 
 if __name__ == '__main__':
-    pygame.init()
-
-    # 初始化joystick
-    pygame.joystick.init()
-
-    # 得到joystick的数量
-    joystick_count = pygame.joystick.get_count()
-    print("Number of joysticks: {}".format(joystick_count))
-
-    # 之考虑一个手柄
-    joystick = pygame.joystick.Joystick(0)
-    # 按键映射对象
-    joyToKey = JoyToKey()
-
-    # -------- 程序主循环 -----------
-    # 保持循环直到用户点击关闭按钮
-    done = False
-    while not done:
-        # 事件处理的步骤
-        # 手柄事件触发
-        for event in pygame.event.get():
-            # 如果用户触发了关闭事件
-            if event.type == pygame.QUIT:
-                # 设置我们做了这件事的标志，所以我们就可以退出循环了
-                done = True
-            else:
-                joyToKey.exec(joystick, event)
-
-    # 关闭窗口并退出.
-    pygame.quit()
+    main()
