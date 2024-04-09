@@ -190,7 +190,7 @@ def createInsertSql(tablecode, map):
             sql += 'sys_guid()'
         elif string is None:
             sql += 'null'
-        elif result.lower() == "dbversion":
+        elif result.lower() == "dbversion" or result.lower() == "version":
             sql += 'null'
         elif result.lower() == "province":
             sql += "'" + ARGS.wprovince if ARGS.wprovince is not None else "87" + "'"
@@ -229,8 +229,8 @@ def getColumnByTablecode(tablecode):
 
 def generalSql():
     print("**************************************************")
-    print("查数财政: " + ARGS.qprovince)
-    print("查数年度: " + ARGS.qyear)
+    print("查数财政: " + ARGS.rprovince)
+    print("查数年度: " + ARGS.ryear)
     print("写出财政: " + ARGS.wprovince)
     print("写出年度: " + ARGS.wyear)
     print("数据库连接: " + ARGS.connstr)
@@ -297,11 +297,60 @@ def argparseFunc():
     print('ARGS:', ARGS)
     return ARGS
 
+def writeVoucherConfigByAppid(appid):
+    """
+    单据信息写入新的区划
+    """
+    condition = " appid = '" + appid + "'"
+    tablecode = "p#fasp_t_pavoucher"
+
+    # 清理原数据
+    sql = "delete from " + tablecode + " t where province = '" + ARGS.wprovince + "' and year = '" + ARGS.wyear + "' and (" + condition + ")"
+    cur.execute(sql)
+    # 写入新数据
+    sql = "insert into " + tablecode + " select * from " + tablecode + " where province = '" + ARGS.wprovince + "' and year = '" + ARGS.wyear + "' and (" + condition + ")"
+    cur.execute(sql)
+
+def writeUIPageByAppid(appid):
+    pass
+
+
+def writePapageByAppid(appid):
+    pass
+
+
+def write2():
+    print("**************************************************")
+    print("查数财政: " + ARGS.rprovince)
+    print("查数年度: " + ARGS.ryear)
+    print("写出财政: " + ARGS.wprovince)
+    print("写出年度: " + ARGS.wyear)
+    print("数据库连接: " + ARGS.connstr)
+    print("输出路径: " + ARGS.outputfile)
+    print("starting ......")
+
+    if ARGS.connstr == "":
+        raise Exception('数据库连接信息为空')
+
+    global con
+    con = cx_Oracle.connect(ARGS.connstr)
+    global cur
+    cur = con.cursor()
+
+    writeVoucherConfigByAppid(ARGS.appid)
+    writePapageByAppid(ARGS.appid)
+    writeUIPageByAppid(ARGS.appid)
+
+    con.close()
+    print("sucess ......")
+
 
 if __name__ == "__main__":
 
     ARGS = argparseFunc()
     if ARGS.mouldid is not None:
         getVouchConfigByMouldID(ARGS.mouldid)
-    else:
+    elif str(ARGS.gensql) == "true":
         generalSql()
+    else:
+        write2()

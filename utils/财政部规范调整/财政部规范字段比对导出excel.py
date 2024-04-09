@@ -46,7 +46,7 @@ def compareToExcel(tableV1, tableV2):
             tableObj['table_name'] = str(result[1])
             tableCode = str(result[1])
             if tableCode.startswith("PAY_") or tableCode.startswith("GP_") or tableCode.startswith(
-                    "INC_") or tableCode.startswith("TAX_"):
+                    "INC_") or tableCode.startswith("TAX_") or tableCode.startswith("PAY_REPORT") or tableCode.startswith("GFA_") :
                     # or tableCode.startswith("ACCT_") or tableCode.startswith("GLF_")\
                 v2AddTableDataList.append(tableObj)
         print("新增的表: ", v2AddTableDataList)
@@ -103,7 +103,7 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['required'] = str(result[4])
 
                 if tableName.startswith("PAY_") or tableName.startswith("GP_") or tableName.startswith(
-                        "INC_") or tableName.startswith("TAX_"):
+                        "INC_")  or tableCode.startswith("TAX_") or tableCode.startswith("PAY_REPORT") or tableCode.startswith("GFA_")  :
                     addFieldList.append(fieldObj)
 
             # v2->v1版本变更的列
@@ -127,7 +127,7 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['v2_length'] = str(result[6])
                 fieldObj['v2_required'] = str(result[7])
                 if tableName.startswith("PAY_") or tableName.startswith("GP_") or tableName.startswith(
-                        "INC_") or tableName.startswith("TAX_"):
+                        "INC_")  or tableCode.startswith("TAX_") or tableCode.startswith("PAY_REPORT") or tableCode.startswith("GFA_") :
                     modFieldList.append(fieldObj)
             # 1.2 长度变更
             sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required, t1.type as v2_type, t1.length as v2_length, t1.required as v2_required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.length <> t2.length"
@@ -153,7 +153,7 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['v2_length'] = str(result[6])
                 fieldObj['v2_required'] = str(result[7])
                 if tableName.startswith("PAY_") or tableName.startswith("GP_") or tableName.startswith(
-                        "INC_") or tableName.startswith("TAX_"):
+                        "INC_")  or tableCode.startswith("TAX_") or tableCode.startswith("PAY_REPORT") or tableCode.startswith("GFA_") :
                     modFieldList.append(fieldObj)
             # 1.3 类型变更
             sql = "SELECT t2.col_code, t2.col_name, t2.type, t2.length, t2.required, t1.type as v2_type, t1.length as v2_length, t1.required as v2_required FROM " + tableV2 + " t1, " + tableV1 + " t2 WHERE t1.table_name = '" + tableName + "' and t2.table_name = '" + tableName + "' AND t1.col_code = t2.col_code and t1.type <> t2.type"
@@ -183,7 +183,7 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['v2_length'] = str(result[6])
                 fieldObj['v2_required'] = str(result[7])
                 if tableName.startswith("PAY_") or tableName.startswith("GP_") or tableName.startswith(
-                        "INC_") or tableName.startswith("TAX_"):
+                        "INC_")  or tableCode.startswith("TAX_") or tableCode.startswith("PAY_REPORT") or tableCode.startswith("GFA_") :
                     modFieldList.append(fieldObj)
             # v2->v1版本删除的列
             # 跟集成库比对删除列无意义, excel中删掉即可
@@ -203,7 +203,7 @@ def compareToExcel(tableV1, tableV2):
                 fieldObj['required'] = str(result[4])
                 # 临时去掉删除列, 根据需要打开
                 # if tableCode.startswith("PAY_") or tableCode.startswith("GP_") or tableCode.startswith(
-                #         "INC_") or tableCode.startswith("TAX_"):
+                #         "INC_") or tableCode.startswith("TAX_") or tableCode.startswith("PAY_REPORT") or tableCode.startswith("GFA_") :
                     # or tableCode.startswith("ACCT_") or tableCode.startswith("GLF_")\
                     # 集成库比对, 不需要删除列，临时注释掉
                     # delFieldList.append(fieldObj)
@@ -265,12 +265,12 @@ def compareToExcel(tableV1, tableV2):
         sheet['G' + str(index + 2)].value = ele['type'] + "(" + ele['length'] + ")"
         sheet['H' + str(index + 2)].value = ele['required']
 
-    wb.save('/tmp/2.0规范表及字段变更明细-浙江.xlsx')
+    wb.save('/tmp/2.0规范表及字段变更明细-全国.xlsx')
 
 
 if __name__ == '__main__':
     # 生成字段比对报告, 根据两个版本表比对
     # 全国
-    # compareToExcel("STANDARD_FIELD_V1_JC20230505", "STANDARD_FIELD_V2_20230505")
+    compareToExcel("STANDARD_FIELD_V1_JC20230505", "STANDARD_FIELD_V2_20230505")
     # 浙江
-    compareToExcel("STANDARD_FIELD_V1_ZJ20230918", "STANDARD_FIELD_V2_20230505")
+    # compareToExcel("STANDARD_FIELD_V1_ZJ20230918", "STANDARD_FIELD_V2_20230505")
