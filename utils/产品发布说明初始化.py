@@ -44,7 +44,7 @@ def main():
     print('读取版本发布计划的行...')
     allRows = []
     for row in sheet.iter_rows(min_row=9, values_only=True):
-        rowData = {'content': row[0], 'srcId': row[1]}
+        rowData = {'content': row[2], 'srcId': row[3]}
         allRows.append(rowData)
 
     wb.close()
