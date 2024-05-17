@@ -1,73 +1,116 @@
 import time
 from urllib import parse
-
+import schedule
+import configparser
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-# 配置
-LOGIN_URL = 'http://192.168.22.122:8001/uportal/login'
-EXPORT_URL = 'http://192.168.22.122:8001/pay/commonmanagerequest/audit.page?mouldid=2395F892FE0FB5723E07BCE9DBC1B761&vchtypeid=D8B9A1F343F5A192B4C558976559E12A&mainmenu=pay0000&submenu=25377D85328251CB5A90C219D3272ADD&appid=pay&year=2024&tokenid=#tokenid&menuId=25377D85328251CB5A90C219D3272ADD&menuName=%E5%8D%95%E4%BD%8D%E5%AE%A1%E6%A0%B8&theme=default'
-DOWNLOAD_DIR = '/tmp'
-USERNAME = '3400_admin'
-PASSWORD = '1Qa1234567890'
+# 配置文件路径
+CONFIG_FILE = 'config.ini'
 
-# 设置Chrome选项
-chrome_options = webdriver.ChromeOptions()
-prefs = {'download.default_directory': DOWNLOAD_DIR,
-         "download.prompt_for_download": False,
-         "download.directory_upgrade": True,
-         "safebrowsing.enabled": True
-         }
-chrome_options.add_experimental_option('prefs', prefs)
 
-# 使用webdriver_manager自动下载和安装ChromeDriver
-driver = webdriver.Chrome(executable_path='/tmp/chromedriver-linux64/chromedriver', options=chrome_options)
+def load_config():
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE)
+    return config
 
-try:
-    # 打开登录页面
-    driver.get(LOGIN_URL)
+
+def setup_chrome_options(download_dir):
+    chrome_options = webdriver.ChromeOptions()
+    prefs = {'download.default_directory': download_dir,
+             "download.prompt_for_download": False,
+             "download.directory_upgrade": True,
+             "safebrowsing.enabled": True}
+    chrome_options.add_experimental_option('prefs', prefs)
+    # chrome_options.add_argument('--headless')  # 无头模式
+    # chrome_options.add_argument('--no-sandbox')  # 解决DevToolsActivePort文件不存在的报错
+    # chrome_options.add_argument('--disable-dev-shm-usage')  # 解决内存不足的问题
+    # chrome_options.add_argument("--window-size=1920,1080") # 解决设置成无头模式就报错,设置固定分辨率
+    return chrome_options
+
+
+def login_and_get_token(driver, login_url, username, password):
+    driver.get(login_url)
 
     # 跳转普通登录
-    login_simple = driver.find_element_by_class_name('normalLogin')
+    login_simple = driver.find_element(By.CLASS_NAME, 'normalLogin')
     login_simple.click()
     time.sleep(1)
 
     # 输入用户名和密码进行登录
     username_field = driver.find_element(By.NAME, 'userName')
     password_field = driver.find_element(By.NAME, 'password')
-    login_button = driver.find_element_by_class_name('upbtn')
+    login_button = driver.find_element(By.CLASS_NAME, 'upbtn')
 
-    username_field.send_keys(USERNAME)
-    password_field.send_keys(PASSWORD)
+    username_field.send_keys(username)
+    password_field.send_keys(password)
     login_button.click()
 
     # 等待页面加载和重定向
     time.sleep(5)
 
-    # 切换页签，否则无法获取当前跳转后url,  https://blog.csdn.net/weixin_44623675/article/details/86662462
+    # 切换页签
     driver.switch_to.window(driver.window_handles[0])
     print(driver.current_url)
-    # 获取token（如果需要）
+
+    # 获取token
     url = parse.urlparse(driver.current_url)
     token = parse.parse_qs(url.query).get('tokenid')[0]
     print(token)
+    return token
 
-    # 导出文件,
-    # 1. 替换url中tokenid部分
-    driver.get(EXPORT_URL.replace('#tokenid', token))
-    tab = driver.find_element_by_xpath('/html/body/div[2]/div[3]/ul/li[4]')
-    tab.click()
-    time.sleep(1)  # 根据实际情况调整等待时间
-    export_button = driver.find_element(By.ID, '导出')
-    export_button.click()
-    # time.sleep(5)  # 根据实际情况调整等待时间
-    # confirm = driver.find_element_by_xpath('/html/body/div[8]/div[3]/button[1]')
-    # confirm.click()
-    # 等待文件下载完成
-    time.sleep(10)  # 根据实际情况调整等待时间
 
-finally:
-    # 关闭浏览器
-    driver.quit()
+def download_file(export_url, token, chrome_options, chromedriver_path, download_dir):
+    driver = webdriver.Chrome(executable_path=chromedriver_path, options=chrome_options)
 
-print(f'文件已保存到 {DOWNLOAD_DIR}')
+    try:
+        driver.get(export_url.replace('#tokenid', token))
+        tab = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/ul/li[4]')
+        tab.click()
+        time.sleep(1)
+        export_button = driver.find_element(By.ID, '导出')
+        export_button.click()
+
+        # 等待文件下载完成
+        time.sleep(10)
+    finally:
+        driver.quit()
+
+    print(f'文件已保存到 {download_dir}')
+
+
+def job(config):
+    login_url = config['settings']['LOGIN_URL']
+    username = config['settings']['USERNAME']
+    password = config['settings']['PASSWORD']
+    chromedriver_path = config['settings']['CHROMEDRIVER_PATH']
+    download_dir = config['settings']['DOWNLOAD_DIR']
+    export_urls = config['urls']['EXPORT_URLS'].split(',')
+
+    chrome_options = setup_chrome_options(download_dir)
+    driver = webdriver.Chrome(executable_path=chromedriver_path, options=chrome_options)
+
+    try:
+        token = login_and_get_token(driver, login_url, username, password)
+        for export_url in export_urls:
+            download_file(export_url, token, chrome_options, chromedriver_path, download_dir)
+    finally:
+        driver.quit()
+
+
+def main():
+    config = load_config()
+    schedule_time = config['schedule']['TIME']
+    # 定时执行
+    # schedule.every().day.at(schedule_time).do(job, config)
+    #
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
+
+    # 临时测试
+    job(config)
+
+
+if __name__ == '__main__':
+    main()
