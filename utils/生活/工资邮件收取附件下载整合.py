@@ -6,7 +6,7 @@
 # @author zhaozhiwei
 # @date 2023/4/13 上午10:43
 # @version V1.0
-
+import datetime
 import email
 import os
 import poplib
@@ -168,7 +168,8 @@ def excel_archive(savepath):
     # 下边输出的玩意儿copy贴到orgmode， 然后ctrl+c | 搞定
     # print('复制下边输出结果到orgmode')
     for item in dataList:
-        print(item['时间'], ' ', item['实发'], ' ', item['个税'], ' ', item['养老'], ' ', item['医疗'], ' ', item['公积金'])
+        print(item['时间'], ' ', item['实发'], ' ', item['个税'], ' ', item['养老'], ' ', item['医疗'], ' ',
+              item['公积金'])
 
 
 if __name__ == '__main__':
@@ -182,6 +183,9 @@ if __name__ == '__main__':
     # print(mails)
     # 倒序遍历邮件
     index = len(mails)
+
+    # 获取当前年度
+    year = datetime.datetime.now().year
     for i in range(index, 0, -1):
         try:
             # lines存储了邮件的原始文本的每一行
@@ -201,7 +205,7 @@ if __name__ == '__main__':
             # 来源hr的, 标题是工资条的
             # 获取消息标题
             subject = decode_str(msg.get('Subject'))
-            if '工资条' in subject:
+            if '工资条' in subject and (str(year) + '年') in subject:
                 # 获取附件
                 # 第三步：附件下载
                 f_list = get_att(msg, savepath=os.path.join(rootPath, str(subject).replace("转发： ", "") + '.rar'))

@@ -65,13 +65,17 @@ def download_file(export_url, token, chrome_options, chromedriver_path, download
 
     try:
         driver.get(export_url.replace('#tokenid', token))
-        tab = driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/ul/li[4]')
-        tab.click()
-        time.sleep(1)
-        export_button = driver.find_element(By.ID, '导出')
-        export_button.click()
+        # 获取所有按钮
+        allSpan = driver.find_element_by_class_name('boxOperList').find_elements_by_tag_name('span')
+        # 根据描述获取导出按钮   报表导出
+        for spanItem in allSpan:
+            if spanItem.text == '报表导出':
+                spanItem.click()
 
         # 等待文件下载完成
+        time.sleep(2)
+        # 点击确认按钮, 这里不同的浏览器可能得单独调试
+        driver.find_element_by_xpath('/html/body/div[5]/div[2]/div[2]/div/div/a[2]/span/span/span[2]').click()
         time.sleep(10)
     finally:
         driver.quit()
