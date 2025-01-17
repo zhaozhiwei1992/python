@@ -1,6 +1,9 @@
 # -*- coding: utf8 -*-
-from datetime import date
+from datetime import date, datetime
 import requests
+from telegram import Bot
+from telegram.utils.request import Request
+import os
 
 request_params = {
     "headers": {
@@ -9,9 +12,6 @@ request_params = {
     },
     "timeout": 10
 }
-
-# 设置钉钉 webhook
-webhook_url = "https://oapi.dingtalk.com/robot/send?access_token=088539a54fcebf90c85a6408f71b919cc404bc3570c9fc4a36cc2f12894bb9e4"
 
 
 def get_today_bonds():
@@ -32,7 +32,8 @@ def get_today_bonds():
         print(f"{bond['zqName']}: 申购日期:{bond['sgDate']}")
 
         currentDate = date.today()
-        sgDate = date.fromisoformat(bond['sgDate'])
+        # sgDate = date.fromisoformat(bond['sgDate'])
+        sgDate = datetime.strptime(bond['sgDate'], "%Y-%m-%d").date()
         # 三天内预约
         timedelta = sgDate - currentDate
         if 0 < timedelta.days < 4:
@@ -50,19 +51,41 @@ def get_today_bonds():
     # print("bonds:\n", "\n".join(textList))
     # 钉钉里设置了标签为bonds, 必须传
     if len(textList) > 0:
-        send_msg("bonds:\n" + "\n".join(textList))
+        return "bonds:\n" + "\n".join(textList)
 
+def send_telegram_message(msg):
+    # 替换为你的API令牌
+    token = os.environ['TELEGRAM_TOKEN']
+    # 替换为你的Telegram账号的ID
+    chat_id = os.environ['TELEGRAM_CHAT_ID']
+    # 使用带有代理的Session对象创建Bot实例
+    # session = requests.Session()
+    # session.proxies = {
+    #     'http': 'http://127.0.0.1:7890',
+    #     'https': 'http://127.0.0.1:7890',
+    # }
 
-# 发送消息
-def send_msg(text):
+    """
+    python 3.6.15适用
+    """
+    proxy = Request(proxy_url='http://127.0.0.1:7890')
+    bot = Bot(token=token, request=proxy)
+    bot.send_message(chat_id=chat_id, text=msg)
+
+def send_ding_talk_message(msg):
+    # 设置钉钉 webhook
+    webhook_url = "https://oapi.dingtalk.com/robot/send?access_token=" + os.environ["DING_TALK_TOKEN"]
+
     r = requests.post(webhook_url, json={
         "msgtype": "text",
         "text": {
-            "content": text
+            "content": msg
         }
     }, **request_params)
 
-
 if __name__ == '__main__':
-    # main_handler("", "") 腾讯云函数的
-    get_today_bonds()
+    # 获取当天可转债
+    msg = get_today_bonds()
+    # msg = 'hello world'
+    # send_ding_talk_message(msg)
+    send_telegram_message(msg)

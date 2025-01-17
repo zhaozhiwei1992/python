@@ -28,7 +28,7 @@ def main():
         print("用法: python script.py <APP_ID> <VERSION>")
         return
 
-    appid, version = sys.argv[1], sys.argv[2]
+    appid, version = sys.argv[1] or 'PAYZJ', sys.argv[2] or 'V_1.1.0'
 
     # 使用 Pathlib 构建文件路径，更加清晰和高效
     if appid.upper() in ("NFCS", "ISA"):
@@ -62,7 +62,7 @@ def main():
     sheet['F2'].value = appid
     sheet['C2'].value = appName
     sheet['H2'].value = f"{month}月{day}日"
-    sheet['H15'].value = f"{month}月{day}日"
+    sheet['H18'].value = f"{month}月{day}日"
     sheet['B7'].value = f"{appName}后端"
     sheet['B8'].value = f"{appName}前端"
     sheet['C7'].value = version.replace("_", ".")
