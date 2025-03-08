@@ -16,6 +16,8 @@ async def create_report(obj: schemas.ReportCreate, db: Session = Depends(get_db)
         if sql.strip() == "":
             continue
         # print(sql)
+        if db.is_active is False:
+            db = next(get_db())
         result = db.execute(sql)
         # print(result)
         print(result.fetchall())
