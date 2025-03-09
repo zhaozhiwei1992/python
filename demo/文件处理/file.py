@@ -5,6 +5,8 @@ print(os.getcwd())
 # 更改工作目录
 # os.chdir("xx")
 
+print(os.path.abspath(os.path.join("/d", 'blog', 'x.md')))
+
 # 创建文件夹 os.mkkedirs (会创建根目录及子目录)
 if not os.path.exists("D:\\tmp\\pythontest\\1"):
     os.makedirs("D:\\tmp\\pythontest\\1")
