@@ -112,7 +112,7 @@ def connect_mail():
     return server
 
 
-def excel_archive(savepath):
+def excel_2_csv(savepath):
     """
     处理工资excel, 解析数据, 合并生成csv格式数据
     """
@@ -170,7 +170,46 @@ def excel_archive(savepath):
     for item in dataList:
         print(item['时间'], ' ', item['实发'], ' ', item['个税'], ' ', item['养老'], ' ', item['医疗'], ' ',
               item['公积金'])
+def excel_merge(savepath):
+    """
+    处理工资excel, 解析数据, 合并生成csv格式数据
+    """
+    # 所有工资数据
+    data = []
+    for root, dirs, files in os.walk(savepath):
+        try:
+            for dir in dirs:
+                # 读取带有 工资条 的文件夹, 读取里边的xlsx文件
+                if "工资条" not in dir:
+                    continue
+                # 获取每个目录下文件 LT-1336_赵志伟.xlsx
+                file_name = os.path.join(root, dir, 'LT-1336_赵志伟.xlsx')
+                wb = openpyxl.load_workbook(file_name)
+                sheet = wb.worksheets[0]
+                # 读取第五行数据并放入集合中, 并且按照月份排序
+                item = {}
+                item['时间'] = str(dir).replace("工资条", "").replace("年", "-").replace("月", "")
+                year = str(item['时间']).split('-')[0]
+                month = str(item['时间']).split('-')[1]
+                for row in sheet.iter_rows(min_row=5, values_only=True):
+                    new_row = list(row)
+                    new_row[0] = month
+                    data.append(new_row)
+                    # print(new_row)
 
+        except Exception as err:
+            print(err)
+    # 按照月份排序
+    data.sort(key=lambda x: int(x[0]))
+    print(data)
+    # 将数据写入一个新的excel中
+    wb = openpyxl.load_workbook('template.xlsx')
+    # 获取第一个sheet
+    sheet = wb.worksheets[0]
+    # 从第五行开始将data全部写入到excel中
+    for row in data:
+        sheet.append(row)
+    wb.save('/tmp/LT-1336_赵志伟.xlsx')
 
 if __name__ == '__main__':
     # 第一步：邮箱登录
@@ -186,6 +225,7 @@ if __name__ == '__main__':
 
     # 获取当前年度
     year = datetime.datetime.now().year
+    # year = 2024
     for i in range(index, 0, -1):
         try:
             # lines存储了邮件的原始文本的每一行
@@ -216,5 +256,7 @@ if __name__ == '__main__':
 
     # 第四步：解压附件并按顺序合并成一个
     dcompress(savepath=rootPath)
-    # excel合并归档
-    excel_archive(savepath=rootPath)
+    # excel合并成一个, 按月排序
+    excel_merge(savepath=rootPath)
+    # 必要信息生成csv
+    excel_2_csv(savepath=rootPath)

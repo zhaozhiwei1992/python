@@ -43,3 +43,14 @@ print(len(set(nums)))
 # 牛逼的语法啊, for前面的num可以做其他操作然后构成集合
 nums = [num for num in range(6)]
 print(nums)
+
+import json
+def main(arg1: str, arg2: []) -> dict:
+    obj = json.loads(arg1)['data']
+    # templateText = arg2[0]['content'].format(**obj)
+    # return {
+    #     "result": templateText.split("===数据源")[0],
+    # }
+    return {
+        "result": {"args":obj, "arg2":arg2[0]['content']}
+    }
