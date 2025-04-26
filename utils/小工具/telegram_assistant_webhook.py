@@ -20,7 +20,7 @@ import telebot
 API_TOKEN = '8157711635:AAG-D7fwvkC8LlMsY41MunQAukDB1sqX_BI'
 
 WEBHOOK_HOST = '43.143.194.245'
-WEBHOOK_PORT = 8444  # 443, 80, 88 or 8443 (port need to be 'open')
+WEBHOOK_PORT = 443  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_PATH = "assistant"
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
 
@@ -35,7 +35,6 @@ WEBHOOK_SSL_PRIV = './ssl/webhook_key.pem'  # Path to the ssl private key
 # with the same value in you put in WEBHOOK_HOST
 
 WEBHOOK_URL_BASE = "https://{}:{}/{}".format(WEBHOOK_HOST, WEBHOOK_PORT, WEBHOOK_PATH)
-WEBHOOK_URL_PATH = "/{}/".format(API_TOKEN)
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
@@ -45,7 +44,7 @@ bot = telebot.TeleBot(API_TOKEN)
 app = fastapi.FastAPI(docs=None, redoc_url=None)
 
 
-@app.post(f'/{WEBHOOK_PATH}/{API_TOKEN}/')
+@app.post(f'/{WEBHOOK_URL_BASE}/')
 def process_webhook(update: dict):
     """
     Process webhook calls
@@ -94,7 +93,7 @@ def handle_local_command(message):
 
 # Set webhook
 bot.set_webhook(
-    url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
+    url=WEBHOOK_URL_BASE,
     # 如果需要全部用自签名证书再放开
     certificate=open(WEBHOOK_SSL_CERT, 'r')
 )
@@ -102,8 +101,8 @@ bot.set_webhook(
 
 uvicorn.run(
     app,
-    host=WEBHOOK_LISTEN,
-    port=WEBHOOK_PORT,
+    host='0.0.0.0',
+    port=8444,
     ssl_certfile=WEBHOOK_SSL_CERT,
     ssl_keyfile=WEBHOOK_SSL_PRIV
 )
