@@ -34,7 +34,7 @@ WEBHOOK_SSL_PRIV = './ssl/webhook_key.pem'  # Path to the ssl private key
 # When asked for "Common Name (e.g. server FQDN or YOUR name)" you should reply
 # with the same value in you put in WEBHOOK_HOST
 
-WEBHOOK_URL_BASE = "https://{}:{}/{}".format(WEBHOOK_HOST, WEBHOOK_PORT, WEBHOOK_PATH)
+WEBHOOK_URL_BASE = "https://{}:{}/{}/".format(WEBHOOK_HOST, WEBHOOK_PORT, WEBHOOK_PATH)
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
@@ -44,7 +44,7 @@ bot = telebot.TeleBot(API_TOKEN)
 app = fastapi.FastAPI(docs=None, redoc_url=None)
 
 
-@app.post(f'/{WEBHOOK_URL_BASE}/')
+@app.post(f'/{WEBHOOK_PATH}/')
 def process_webhook(update: dict):
     """
     Process webhook calls
