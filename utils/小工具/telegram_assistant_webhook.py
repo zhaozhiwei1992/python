@@ -25,7 +25,7 @@ WEBHOOK_PATH = "assistant"
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
 
 WEBHOOK_SSL_CERT = './ssl/webhook_cert.pem'  # Path to the ssl certificate
-WEBHOOK_SSL_PRIV = './ssl/webhook_pkey.pem'  # Path to the ssl private key
+WEBHOOK_SSL_PRIV = './ssl/webhook_key.pem'  # Path to the ssl private key
 
 # Quick'n'dirty SSL certificate generation:
 #
@@ -96,7 +96,7 @@ def handle_local_command(message):
 bot.set_webhook(
     url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
     # 如果需要全部用自签名证书再放开
-    # certificate=open(WEBHOOK_SSL_CERT, 'r')
+    certificate=open(WEBHOOK_SSL_CERT, 'r')
 )
 
 
@@ -104,8 +104,8 @@ uvicorn.run(
     app,
     host=WEBHOOK_LISTEN,
     port=WEBHOOK_PORT,
-    # ssl_certfile=WEBHOOK_SSL_CERT,
-    # ssl_keyfile=WEBHOOK_SSL_PRIV
+    ssl_certfile=WEBHOOK_SSL_CERT,
+    ssl_keyfile=WEBHOOK_SSL_PRIV
 )
 
 def call_dify_api(prompt):
