@@ -50,6 +50,7 @@ def process_webhook(update: dict):
     """
     Process webhook calls
     """
+    print("收到消息:", update)
     if update:
         update = telebot.types.Update.de_json(update)
         bot.process_new_updates([update])
