@@ -62,6 +62,7 @@ def send_welcome(message):
     """
     Handle '/start' and '/help'
     """
+    print("收到消息:", message)
     bot.reply_to(message,
                  ("Hi there, I am EchoBot.\n"
                   "I am here to echo your kind words back to you."))
