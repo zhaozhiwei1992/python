@@ -87,8 +87,9 @@ def handle_dify_command(message):
 @bot.message_handler(commands=['local'])
 def handle_local_command(message):
     cmd = message.text.split(" ", 1)[1]
-    result = subprocess.run(cmd, shell=True, capture_output=True)
-    bot.reply_to(message, result.stdout.decode())
+    # result = subprocess.run(cmd, shell=True, capture_output=True)
+    result = safe_local_exec(cmd)
+    bot.reply_to(message, result)
 
 
 # Remove webhook, it fails sometimes the set if there is a previous webhook

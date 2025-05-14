@@ -203,7 +203,7 @@ def excel_merge(savepath):
     data.sort(key=lambda x: int(x[0]))
     print(data)
     # 将数据写入一个新的excel中
-    wb = openpyxl.load_workbook('template.xlsx')
+    wb = openpyxl.load_workbook('/tmp/template.xlsx')
     # 获取第一个sheet
     sheet = wb.worksheets[0]
     # 从第五行开始将data全部写入到excel中
