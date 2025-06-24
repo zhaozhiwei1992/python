@@ -76,6 +76,8 @@ def get_img_url(raw_img_url="https://area.sinaapp.com/bingImg/"):
     response = requests.get(raw_img_url)
     responseObj = json.loads(response.text)
     img_url = 'https://cn.bing.com' + responseObj['images'][0]['url']
+    # 高清图/th?id=OHR.DelicateArch_ZH-CN8971667580_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp将返回url中的1920x1080替换为UHD即可，按需打开。
+    # img_url = img_url.replace('1920x1080', 'UHD')
     # img_url = response.url  # 得到图片文件的网址
     # print('img_url:', img_url)
     return img_url
