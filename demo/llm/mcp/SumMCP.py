@@ -1,5 +1,15 @@
 """
 加法计算的一个MCP Server
+
+    "demo": {
+      "command": "/home/zhaozhiwei/miniconda3/envs/py_3.12/bin/fastmcp",
+      "args": [
+        "run",
+        "/home/zhaozhiwei/workspace/python/demo/llm/mcp/SumMCP.py"
+      ],
+      "disabled": false,
+      "alwaysAllow": []
+    },
 """
 # server.py
 from fastmcp import FastMCP
@@ -20,5 +30,5 @@ def listdir(path: str) -> list[str]:
 
 if __name__ == "__main__":
     # mcp.run()
-    # mcp.run(transport="sse", port=9123)  # 网页6推荐SSE协议
+    # mcp.run(transport="sse", port=9123)
     mcp.run(transport='stdio')
