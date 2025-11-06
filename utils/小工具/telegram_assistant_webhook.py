@@ -16,11 +16,13 @@ import fastapi
 import requests
 import uvicorn
 import telebot
+import os
 
-API_TOKEN = '8157711635:AAG-D7fwvkC8LlMsY41MunQAukDB1sqX_BI'
+# 一定要是这个机器人对应的token, 写到环境变量里
+API_TOKEN= os.environ['TELEGRAM_ASSISTANT']
 
 WEBHOOK_HOST = '19921514.xyz'
-WEBHOOK_PORT = 443  # 443, 80, 88 or 8443 (port need to be 'open')
+# WEBHOOK_PORT = 443  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_PATH = "assistant"
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
 
@@ -34,7 +36,7 @@ WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
 # When asked for "Common Name (e.g. server FQDN or YOUR name)" you should reply
 # with the same value in you put in WEBHOOK_HOST
 
-WEBHOOK_URL_BASE = "https://{}:{}/{}/".format(WEBHOOK_HOST, WEBHOOK_PORT, WEBHOOK_PATH)
+WEBHOOK_URL_BASE = "https://{}/{}/".format(WEBHOOK_HOST, WEBHOOK_PATH)
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
@@ -45,6 +47,18 @@ app = fastapi.FastAPI(docs=None, redoc_url=None)
 
 
 # curl -v -k -X POST http://localhost:8444/assistant/
+# curl -X POST "https://域名/assistant/" \
+# -H "Content-Type: application/json" \
+# -d '{
+#     "update_id": 10000,
+#     "message": {
+#         "message_id": 1,
+#         "from": {"id": 12345, "is_bot": false, "first_name": "Test"},
+#         "chat": {"id": 12345, "type": "private"},
+#         "date": 1648317600,
+#         "text": "/start"
+#     }
+# }'
 @app.post(f'/{WEBHOOK_PATH}/')
 def process_webhook(update: dict):
     """
@@ -96,10 +110,10 @@ def handle_local_command(message):
 # bot.remove_webhook()
 
 # Set webhook
+# 如果需要全部用自签名证书再放开
+# certificate=open(WEBHOOK_SSL_CERT, 'r')
 bot.set_webhook(
     url=WEBHOOK_URL_BASE,
-    # 如果需要全部用自签名证书再放开
-    # certificate=open(WEBHOOK_SSL_CERT, 'r')
 )
 
 # 本地服务启动地址，本地用http就够了，如果设置了ssl,自动会用https
@@ -130,3 +144,5 @@ def safe_local_exec(cmd):
         shell=True,
         timeout=30
     ).stdout.decode()
+
+
