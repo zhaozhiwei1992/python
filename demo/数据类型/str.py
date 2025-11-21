@@ -53,6 +53,8 @@ slice_str = '12345'
 print("从0开始3个字符", slice_str[0:3:])
 print("从头到尾", slice_str[:])
 print("最后一个字符", slice_str[-1:])
+print("只显示3之后的字符", slice_str[slice_str.find('3') + 1:])
+print("去掉收尾字符", slice_str[1:-1])
 
 colType = "V1: VARCHAR2(7), V2: NString(11)"
 print(colType[colType.find("V2:") + 4:])
@@ -60,3 +62,7 @@ print(colType[colType.find("V2:") + 4:])
 colType = "numeric(20, 2)"
 print(colType[:colType.find("(")])
 print(colType[colType.find("(") + 1:colType.find(",")])
+
+str1 = "123"
+str2 = "456"
+print(f"""合并了每{str1},{str2}""")

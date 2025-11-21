@@ -23,7 +23,7 @@ print("json.loads将字符串转为Python对象: json.loads(s) = {}".format(json
 
 # json.load读取文件并将文件内容转为Python对象
 # 数据文件要s.json的内容 --> {"name": "wade", "age": 54, "gender": "man"}
-with open('s.json', 'r') as f:
-    s1 = json.load(f)
-    print("json.load将文件内容转为Python对象: type(json.load(f)) = {}".format(type(s1)))
-    print("json.load将文件内容转为Python对象: json.load(f) = {}".format(s1))
+# with open('s.json', 'r') as f:
+#     s1 = json.load(f)
+#     print("json.load将文件内容转为Python对象: type(json.load(f)) = {}".format(type(s1)))
+#     print("json.load将文件内容转为Python对象: json.load(f) = {}".format(s1))

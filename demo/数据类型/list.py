@@ -1,3 +1,5 @@
+from importlib.util import source_hash
+
 nums = [2, 4, 6, 8, 9]
 #  所有大于２的数字乘以２后放入集合中
 nums = [i * 2 for i in nums if i > 2]
@@ -54,3 +56,8 @@ def main(arg1: str, arg2: []) -> dict:
     return {
         "result": {"args":obj, "arg2":arg2[0]['content']}
     }
+
+records = [{"q":"q1xx","res":"res111xx"},{"q":"q2xxx", "res":"res22"}]
+content = '\n\n'.join([f'''***问题{i + 1}:*** {record['q']}\n***依据:*** {record['res']}''' for i, record in enumerate(records)])
+
+print(content)
