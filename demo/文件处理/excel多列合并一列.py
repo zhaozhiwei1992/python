@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     # 1. 提取并合并列信息
     print('Opening workbook...')
-    wb = openpyxl.load_workbook('/home/zhaozhiwei/Downloads/项目信息.xlsx', read_only=True)
+    wb = openpyxl.load_workbook('/home/zhaozhiwei/Documents/2026年省级项目支出预算标准表.xlsx', read_only=True)
     print("所有sheet", wb.sheetnames)
     # 获取sheet
     # sheet = wb.get_sheet_by_name(wb.sheetnames[0])
@@ -58,14 +58,14 @@ if __name__ == '__main__':
     #     result.append(content)
 
     # 性能很好，可以采用
-    for row_idx, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), 1):
+    for row_idx, row in enumerate(sheet.iter_rows(min_row=7, values_only=True), 1):
         try:
-            # 假设B列是索引1，G列是索引6（根据实际表结构调整）
-            if len(row) >= max(2, 7):  # 确保有足够的列
-                project_code = row[2] or ""  # B列
-                project_content = row[6] or ""  # G列
+            if len(row) >= 12:  # 确保有足够的列
+                d_content = row[3] or ""
+                g_content = row[6] or ""
+                m_content = row[12] or ""
 
-                content = f"项目编码:\n{project_code}\n项目内容:\n{project_content}"
+                content = f"\n{d_content}-{g_content}\n{m_content}\n"
                 result.append(content)
 
             # 分批处理，避免内存溢出[6](@ref)
@@ -79,6 +79,10 @@ if __name__ == '__main__':
 
     wb.close()
 
-    # print(result)
+    # print('#####\n'.join(result))
     # 3. 生成新的excel
-    createExcel(result)
+    # createExcel(result)
+
+    # 4. 写出到txt文件
+    with open("/tmp/项目信息合并.txt", "w") as f:
+        f.write('#####\n'.join(result))
