@@ -12,4 +12,4 @@ VER_PLAN_ORG_SRC_DIR = "/home/zhaozhiwei/workspace/项目管理/发版计划/"
 
 # 系统标识和描述映射
 APPID_NAME_MAP = {"GFBI": "预算执行报表", "PAY": "支付", "PAYZJ": "浙江支付", "OFMS": "其它资金信息系统",
-                  "NFCS": "人大监督联网融合中心", "ISA": "单位端数据交换服务"}
+                  "NFCS": "人大监督联网融合中心", "ISA": "单位端数据交换服务", "IFMISAI":"预算管理一体化AI应用"}
