@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     # 1. 提取并合并列信息
     print('Opening workbook...')
-    wb = openpyxl.load_workbook('/home/zhaozhiwei/Documents/2026年省级项目支出预算标准表.xlsx', read_only=True)
+    wb = openpyxl.load_workbook('/home/zhaozhiwei/Downloads/安徽省厅总会案例库.xlsx', read_only=True)
     print("所有sheet", wb.sheetnames)
     # 获取sheet
     # sheet = wb.get_sheet_by_name(wb.sheetnames[0])
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     print('Reading rows...')
     # 从第一行开始，第一行一般为标题行
     result = []
-    # 性能贼差的凡是
+    # 性能贼差的方式
     # for row in range(1, len(tuple(sheet.rows))):
     #     # Each row in the spreadsheet has data for one census tract.
     #     # B:项目编码 和 G:项目内容合并
@@ -58,12 +58,12 @@ if __name__ == '__main__':
     #     result.append(content)
 
     # 性能很好，可以采用
-    for row_idx, row in enumerate(sheet.iter_rows(min_row=7, values_only=True), 1):
+    for row_idx, row in enumerate(sheet.iter_rows(min_row=1, values_only=True), 1):
         try:
-            if len(row) >= 12:  # 确保有足够的列
-                d_content = row[3] or ""
-                g_content = row[6] or ""
-                m_content = row[12] or ""
+            if len(row) >= 1:  # 确保有足够的列
+                d_content = row[1] or ""
+                g_content = row[2] or ""
+                m_content = row[3] or ""
 
                 content = f"\n{d_content}-{g_content}\n{m_content}\n"
                 result.append(content)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
                 # 这里可以添加分批保存逻辑
 
         except Exception as e:
-            print(f"第 {row_idx} 行处理出错: {str(e)}")
+            print(f"第 {row_idx} 行处理出错: {str(e)}, 内容为: {row}, len: {len(row)}")
             continue
 
     wb.close()
@@ -84,5 +84,5 @@ if __name__ == '__main__':
     # createExcel(result)
 
     # 4. 写出到txt文件
-    with open("/tmp/项目信息合并.txt", "w") as f:
+    with open("/tmp/信息合并.txt", "w") as f:
         f.write('#####\n'.join(result))

@@ -33,6 +33,8 @@ def main():
     # 使用 Pathlib 构建文件路径，更加清晰和高效
     if appid.upper() in ("NFCS", "ISA"):
         fbFile = Path(f"/home/zhaozhiwei/workspace/{appid.upper()}/发布说明/版本发布计划.xlsx")
+    elif appid.upper() in ("IFMISAI"):
+        fbFile = Path(f"/home/zhaozhiwei/workspace/ifmis-4.1/common-llm/发布说明/版本发布计划.xlsx")
     else:
         fbFile = Path(f"/home/zhaozhiwei/workspace/ifmis-4.1/ifmis-{appid.lower()}/发布说明/版本发布计划.xlsx")
 
@@ -52,6 +54,8 @@ def main():
     # 调整发布说明内容
     if appid.upper() in ("NFCS", "ISA"):
         fbFile = Path(f"/home/zhaozhiwei/workspace/{appid.upper()}/发布说明/产品发布说明模板.xlsx")
+    elif appid.upper() in ("IFMISAI"):
+        fbFile = Path(f"/home/zhaozhiwei/workspace/ifmis-4.1/common-llm/发布说明/产品发布说明模板.xlsx")
     else:
         fbFile = Path(f"/home/zhaozhiwei/workspace/ifmis-4.1/ifmis-{appid.lower()}/发布说明/产品发布说明模板.xlsx")
 
@@ -74,6 +78,9 @@ def main():
     elif appid.upper() == "ISA":
         sheet['E7'].value = f"ifmis-service-agent-{version.replace('_', '.')}-SNAPSHOT.jar"
         sheet['E8'].value = ""
+    elif appid.upper() == "IFMISAI":
+        sheet['E7'].value = f"llm-{version.replace('_', '.')}-SNAPSHOT.jar"
+        sheet['E8'].value = f"ai-vue-{version.replace('_', '.')}.jar"
     else:
         sheet['E7'].value = f"ifmis-{appid.lower()}-service-{version.replace('_', '.')}-SNAPSHOT.jar"
         sheet['E8'].value = f"ifmis-{appid.lower()}-webapp-{version.replace('_', '.')}-SNAPSHOT.jar"
