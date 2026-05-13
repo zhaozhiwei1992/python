@@ -1,0 +1,107 @@
+{
+  "page": 1,
+  "total": 14,
+  "limit": 500,
+  "stories": [
+    {
+      "id": 32767, "product": 364, "title": "【安徽-汪涛涛-17601048219】AI组件窗口新增功能",
+      "pri": 3, "estimate": 24, "status": "reviewing", "stage": "projected",
+      "openedBy": {"id": 904, "account": "wangtaotao", "realname": "汪涛涛"},
+      "openedDate": "2026-05-12T07:15:34Z",
+      "assignedTo": null
+    },
+    {
+      "id": 32699, "product": 364, "title": "湖北ai报告问答页面适配表格组件",
+      "pri": 3, "estimate": 80, "status": "active", "stage": "projected",
+      "openedBy": {"id": 969, "account": "cailuanzi1058", "realname": "蔡峦子"},
+      "openedDate": "2026-05-08T03:34:11Z",
+      "assignedTo": {"id": 977, "account": "donghui1380", "realname": "董晖"}
+    },
+    {
+      "id": 32679, "product": 364, "title": "对话式填单功能",
+      "pri": 2, "estimate": 160, "status": "active", "stage": "projected",
+      "openedBy": {"id": 1665, "account": "ouguofeng", "realname": "欧国峰"},
+      "openedDate": "2026-05-07T04:10:17Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32485, "product": 364, "title": "湖北AI助手开场白接口",
+      "pri": 3, "estimate": 20, "status": "active", "stage": "released",
+      "openedBy": {"id": 969, "account": "cailuanzi1058", "realname": "蔡峦子"},
+      "openedDate": "2026-04-16T08:57:45Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32443, "product": 364, "title": "【合肥-檀江节-13865120754】需要AI中台提供接口以供外部系统维护difi知识库",
+      "pri": 3, "estimate": 40, "status": "active", "stage": "released",
+      "openedBy": {"id": 1557, "account": "tanjiangjie", "realname": "檀江节"},
+      "openedDate": "2026-04-13T02:05:04Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32286, "product": 364, "title": "AI中台适配湖北博思门户打开业务菜单",
+      "pri": 3, "estimate": 40, "status": "active", "stage": "released",
+      "openedBy": {"id": 977, "account": "donghui1380", "realname": "董晖"},
+      "openedDate": "2026-03-31T02:39:59Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32073, "product": 364, "title": "【AI组件】个人可设置自己的主题、外观、字体大小",
+      "pri": 3, "estimate": 24, "status": "active", "stage": "projected",
+      "openedBy": {"id": 1665, "account": "ouguofeng", "realname": "欧国峰"},
+      "openedDate": "2026-03-18T07:58:31Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32071, "product": 364, "title": "【AI组件】优化AI组件回复内容中对Echart、Html的渲染效果",
+      "pri": 3, "estimate": 40, "status": "active", "stage": "released",
+      "openedBy": {"id": 1665, "account": "ouguofeng", "realname": "欧国峰"},
+      "openedDate": "2026-03-18T06:44:15Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32068, "product": 364, "title": "【AI组件】大屏窗口历史对话记录增加置顶、分享、收藏、重命名、删除功能",
+      "pri": 3, "estimate": 24, "status": "active", "stage": "released",
+      "openedBy": {"id": 1665, "account": "ouguofeng", "realname": "欧国峰"},
+      "openedDate": "2026-03-18T05:11:29Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32067, "product": 364, "title": "【AI组件】大屏窗口时左侧历史记录增加查询和一键清空功能",
+      "pri": 2, "estimate": 16, "status": "active", "stage": "released",
+      "openedBy": {"id": 1665, "account": "ouguofeng", "realname": "欧国峰"},
+      "openedDate": "2026-03-18T04:09:40Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32053, "product": 364, "title": "【AI组件】统一AI组件前端交互链接和按钮规范",
+      "pri": 3, "estimate": 24, "status": "active", "stage": "released",
+      "openedBy": {"id": 1665, "account": "ouguofeng", "realname": "欧国峰"},
+      "openedDate": "2026-03-17T11:13:31Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32051, "product": 364, "title": "【AI组件】窗口增加功能",
+      "pri": 2, "estimate": 16, "status": "active", "stage": "released",
+      "openedBy": {"id": 1665, "account": "ouguofeng", "realname": "欧国峰"},
+      "openedDate": "2026-03-17T10:26:44Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 32050, "product": 364, "title": "【AI组件】AI组件窗口优化，支持全屏、边栏、浮窗",
+      "pri": 2, "estimate": 16, "status": "active", "stage": "released",
+      "openedBy": {"id": 1665, "account": "ouguofeng", "realname": "欧国峰"},
+      "openedDate": "2026-03-17T10:12:07Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    },
+    {
+      "id": 31855, "product": 364, "title": "湖北一体化AI助手  适配博思门户",
+      "pri": 3, "estimate": 100, "status": "active", "stage": "released",
+      "openedBy": {"id": 969, "account": "cailuanzi1058", "realname": "蔡峦子"},
+      "openedDate": "2026-03-03T08:08:31Z",
+      "assignedTo": {"id": 976, "account": "zhaozhiwei1336", "realname": "赵志伟"}
+    }
+  ],
+  "tasks": [],
+  "bugs": []
+}

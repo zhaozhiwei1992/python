@@ -1,0 +1,9 @@
+{
+    "zentao_url": "https://10.10.101.28",
+    "account_env": "ZENTAO_ACCOUNT",
+    "password_env": "ZENTAO_PASSWORD",
+    "output_path": "/home/zhaozhiwei/workspace/notes/org-notes/zentao.org",
+    "product_ids": [364],
+    "execution_ids": [],
+    "verify_ssl": false
+}
