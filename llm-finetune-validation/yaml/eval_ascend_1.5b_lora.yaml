@@ -1,0 +1,35 @@
+### 微调模型批量评测（对验证集 ascend_finance_eval 计算 BLEU/ROUGE）
+### 用法: llamafactory-cli eval eval_ascend_1.5b_lora.yaml
+### 产物: saves/Qwen2.5-1.5B-Instruct/lora/eval_finetuned/ 下 predictions.json 与评测报告
+### 注意: llamafactory-cli eval 为 0.9.x 命令；若服务器已升级到新版（eval 已废弃），
+###       改走 do_predict 路线（见笔记"版本兜底"）。
+
+### model
+model_name_or_path: /data/models/qwen2.5-1.5b-instruct
+adapter_name_or_path: saves/Qwen2.5-1.5B-Instruct/lora/train_ascend_finance
+trust_remote_code: true
+
+### method
+stage: sft
+finetuning_type: lora
+
+### dataset
+dataset_dir: data
+dataset: ascend_finance_eval
+template: qwen
+cutoff_len: 1024
+max_samples: 1000
+preprocessing_num_workers: 8
+dataloader_num_workers: 4
+
+### output
+output_dir: saves/Qwen2.5-1.5B-Instruct/lora/eval_finetuned
+overwrite_output_dir: true
+report_to: none
+
+### eval
+per_device_eval_batch_size: 1
+predict_with_generate: true
+max_new_tokens: 512
+infer_dtype: float16
+ddp_timeout: 180000000

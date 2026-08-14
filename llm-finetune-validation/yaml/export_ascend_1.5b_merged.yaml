@@ -1,0 +1,19 @@
+### 导出：合并 LoRA → 完整 HF 模型（可直接部署）
+### 用法: llamafactory-cli export export_ascend_1.5b_merged.yaml
+### 产物: exports/Qwen2.5-1.5B-Instruct-ascend-finance/
+###       （config.json + model-*.safetensors + tokenizer，与基础模型同结构）
+### 验证: ls exports/Qwen2.5-1.5B-Instruct-ascend-finance/ 应含完整权重
+
+### model
+model_name_or_path: /data/models/qwen2.5-1.5b-instruct
+adapter_name_or_path: saves/Qwen2.5-1.5B-Instruct/lora/train_ascend_finance
+export_dir: exports/Qwen2.5-1.5B-Instruct-ascend-finance
+export_size: 2
+export_legacy_format: false
+trust_remote_code: true
+
+### method
+stage: sft
+finetuning_type: lora
+template: qwen
+infer_dtype: float16

@@ -1,0 +1,10 @@
+{
+  "ascend_finance_train": {
+    "file_name": "ascend_finance_train.json",
+    "columns": { "prompt": "instruction", "query": "input", "response": "output" }
+  },
+  "ascend_finance_eval": {
+    "file_name": "ascend_finance_eval.json",
+    "columns": { "prompt": "instruction", "query": "input", "response": "output" }
+  }
+}

@@ -1,0 +1,61 @@
+### 昇腾 NPU LoRA SFT 训练（Qwen2.5-1.5B-Instruct / 财政业务特有知识）
+### 用法: llamafactory-cli train train_ascend_1.5b_lora_sft.yaml
+### 前提: 环境变量已设 USE_BF16=0 USE_FP16=1 NPU_FORCE_FP32_GRAD=1
+###       （见笔记"昇腾专用环境变量"，export 后再跑本命令）
+
+### model
+model_name_or_path: /data/models/qwen2.5-1.5b-instruct
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 16          # 8→16：小数据掰身份需要更强表达能力（身份先验极强，rank 8 更新不动它）
+lora_alpha: 32         # 16→32（保持 alpha=2*rank 惯例）
+lora_dropout: 0.1
+lora_target: all
+
+### dataset
+dataset_dir: data
+dataset: ascend_finance_train
+template: qwen
+cutoff_len: 1024
+max_samples: 100000
+preprocessing_num_workers: 8
+packing: false
+dataloader_num_workers: 4
+dataloader_pin_memory: false
+
+### output
+output_dir: saves/Qwen2.5-1.5B-Instruct/lora/train_ascend_finance
+overwrite_output_dir: true
+plot_loss: true
+include_num_input_tokens_seen: true
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 16
+gradient_checkpointing: true
+learning_rate: 1.0e-04   # 5e-5→1e-4：小数据改身份专用（基座"我是通义千问"先验极强，
+                         # lr 太小压不过去；实测 5e-5 训完"你是谁"仍自称 Qwen）
+num_train_epochs: 8.0    # 5→8：身份样本重复 3 份后共 126 条，8 epoch ≈ 63 步
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+max_grad_norm: 1.0
+logging_steps: 5
+save_steps: 20
+optim: adamw_torch
+ddp_timeout: 180000000
+report_to: none
+
+### precision（昇腾 310P 关键：禁 BF16）
+### 注意：网上 GPU 教程写 fp16: true，那是 CUDA 概念，310P 上不要照抄！
+### 昇腾的混合精度靠环境变量实现：USE_FP16=1（算子层 fp16）+ NPU_FORCE_FP32_GRAD=1
+### （梯度强制 fp32，防溢出）。yaml 里 fp16/bf16 保持 false，训练走 fp32 权重 + fp16 算子。
+fp16: false
+bf16: false
+
+### extras
+flash_attn: disabled
+infer_dtype: float16
