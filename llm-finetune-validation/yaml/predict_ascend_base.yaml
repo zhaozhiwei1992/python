@@ -1,0 +1,37 @@
+### 基础模型（未微调）批量预测评测 —— 对照组（do_predict 路线，完全离线）
+### 用途: 与 predict_ascend_1.5b_lora.yaml 对比，证明"基础模型答不对（分数≈0），
+###       微调后能答对（分数显著升高）"。
+### 用法: llamafactory-cli train predict_ascend_base.yaml
+
+### model
+model_name_or_path: /data/models/qwen2.5-1.5b-instruct
+trust_remote_code: true
+infer_dtype: float16            # 昇腾 310P 必须：NPU 推理用 fp16（CPU/GPU 可去掉或改 bfloat16）
+
+### method
+stage: sft
+finetuning_type: lora
+
+### dataset
+dataset_dir: data
+dataset: ascend_finance_train     # 训练集（本模式不训练，但需可加载）
+eval_dataset: ascend_finance_eval # 评测集（predict 的对象）
+template: qwen
+cutoff_len: 1024
+max_samples: 1000
+preprocessing_num_workers: 8
+
+### output
+output_dir: saves/Qwen2.5-1.5B-Instruct/lora/eval_base
+overwrite_output_dir: true
+report_to: none
+
+### train（预测模式开关，统一走 train 命令）
+do_predict: true
+predict_with_generate: true
+per_device_eval_batch_size: 1
+dataloader_num_workers: 4
+ddp_timeout: 180000000
+
+### generate
+max_new_tokens: 512

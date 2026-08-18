@@ -66,10 +66,13 @@ train() {
 }
 
 eval_step() {
-    log "批量评测（CLI eval，微调模型）—— 仅 0.9.4.dev0 可用，新版走 verify 步骤兜底"
+    log "批量评测（do_predict 路线，离线可用，基础 vs 微调）"
     cd "$LLM_FACTORY_HOME" || die "cd 失败"
-    llamafactory-cli eval "$YAML/eval_ascend_1.5b_lora.yaml" || die "微调模型评测失败"
-    llamafactory-cli eval "$YAML/eval_ascend_base.yaml" || die "基础模型评测失败"
+    # 注意: 默认走离线 do_predict（方案 A，0.9.x 通用、无需外网）。
+    #       方案 B 在线基准评测（需外网 + 仅 ≤0.9.4）可选跑:
+    #       llamafactory-cli eval $YAML/eval_ascend_bench.yaml
+    llamafactory-cli train "$YAML/predict_ascend_1.5b_lora.yaml" || die "微调模型评测失败"
+    llamafactory-cli train "$YAML/predict_ascend_base.yaml" || die "基础模型评测失败"
     echo "  predictions: saves/Qwen2.5-1.5B-Instruct/lora/eval_{finetuned,base}/"
 }
 

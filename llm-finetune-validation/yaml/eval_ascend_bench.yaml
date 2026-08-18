@@ -1,0 +1,28 @@
+### 在线基准评测（方案 B：llamafactory-cli eval + Hub 基准任务）
+### 用途: 用公开基准（MMLU/CMMLU/CEval）客观测"通用能力是否退化"——
+###       微调前后在同一基准上的选择题准确率对比。
+### 用法: llamafactory-cli eval eval_ascend_bench.yaml
+### ⚠ 前提: ① 服务器能连外网（会从 HuggingFace Hub 下载 evaluation/{task} 的
+###           mapping.json 与数据）；② 仅 0.9.4 及更早版本支持本命令
+###           （≥0.9.5 已废弃 eval，报 NotImplementedError，走方案 A 离线 do_predict）。
+### ⚠ 注意: 本命令测的是选择题准确率，不是业务问答 BLEU/ROUGE；
+###          业务效果验证请用方案 A（predict_ascend_*.yaml）。
+### ⚠ save_dir 必须不存在（已存在直接报错），每次评测换新目录。
+
+### model
+model_name_or_path: /data/models/qwen2.5-1.5b-instruct
+adapter_name_or_path: saves/Qwen2.5-1.5B-Instruct/lora/train_ascend_finance
+trust_remote_code: true
+infer_dtype: float16            # 昇腾 310P 必须：NPU 推理用 fp16
+
+### method
+finetuning_type: lora
+
+### dataset（eval 专用参数，勿写 do_predict 那套）
+task: cmmlu_test                # 可用值: mmlu_test | ceval_validation | cmmlu_test（格式=任务_split）
+template: fewshot               # 基准评测固定用 fewshot 模板
+lang: zh                        # mmlu 用 en；cmmlu/ceval 用 zh
+n_shot: 5
+
+### output
+save_dir: saves/Qwen2.5-1.5B-Instruct/lora/eval_bench

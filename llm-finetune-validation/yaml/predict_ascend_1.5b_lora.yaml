@@ -1,0 +1,43 @@
+### 微调模型批量预测评测（do_predict 路线，0.9.x 全版本通用、完全离线）
+### 用法: llamafactory-cli train predict_ascend_1.5b_lora.yaml
+### 产物: output_dir/ 下 predict_results.json（BLEU/ROUGE 分数）+ predictions.json（逐条生成）
+###
+### 重要：不要用 llamafactory-cli eval 做自定义数据集评测！
+###   新版 eval 只支持 Hub 基准任务：yaml 里的 task 字段会去下载 evaluation/{task}
+###   的 mapping.json（MMLU 选择题式评测），离线环境必报
+###   Network is unreachable → LocalEntryNotFoundError。
+###   自定义数据集（问答→BLEU/ROUGE）统一走 train 命令的 do_predict 模式。
+
+### model
+model_name_or_path: /data/models/qwen2.5-1.5b-instruct
+adapter_name_or_path: saves/Qwen2.5-1.5B-Instruct/lora/train_ascend_finance
+trust_remote_code: true
+infer_dtype: float16            # 昇腾 310P 必须：NPU 推理用 fp16（CPU/GPU 可去掉或改 bfloat16）
+
+### method
+stage: sft
+finetuning_type: lora
+
+### dataset
+dataset_dir: data
+dataset: ascend_finance_train     # 训练集（本模式不训练，但需可加载）
+eval_dataset: ascend_finance_eval # 评测集（predict 的对象）
+template: qwen
+cutoff_len: 1024
+max_samples: 1000
+preprocessing_num_workers: 8
+
+### output
+output_dir: saves/Qwen2.5-1.5B-Instruct/lora/eval_finetuned
+overwrite_output_dir: true
+report_to: none
+
+### train（预测模式开关，统一走 train 命令）
+do_predict: true
+predict_with_generate: true
+per_device_eval_batch_size: 1
+dataloader_num_workers: 4
+ddp_timeout: 180000000
+
+### generate
+max_new_tokens: 512
