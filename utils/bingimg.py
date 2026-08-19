@@ -5,7 +5,6 @@ import re
 import time
 import os
 import json
-import pyautogui
 
 def save_img(img_url, dirname):
     # 保存图片到磁盘文件夹dirname
@@ -15,7 +14,7 @@ def save_img(img_url, dirname):
             # os.mkdir(dirname)
             os.makedirs(dirname)
         # 获得图片文件名，包括后缀
-        regex = re.compile('\?[^&]*')
+        regex = re.compile(r'\?[^&]*')
         timestr = time.strftime('%Y%m%d', time.localtime(time.time()))
         basename = str(regex.search(img_url).group()).replace("?id=", "_")
         basename = timestr + basename
@@ -76,12 +75,8 @@ def get_img_url(raw_img_url="https://area.sinaapp.com/bingImg/"):
     response = requests.get(raw_img_url)
     responseObj = json.loads(response.text)
     img_url = 'https://cn.bing.com' + responseObj['images'][0]['url']
-    # 高清图/th?id=OHR.DelicateArch_ZH-CN8971667580_UHD.jpg&rf=LaDigue_UHD.jpg&pid=hp将返回url中的1920x1080替换为UHD即可，按需打开。
-    screen_width, screen_height = pyautogui.size()
-    if screen_width > 1920:
-        img_url = img_url.replace('1920x1080', 'UHD')
-    # img_url = response.url  # 得到图片文件的网址
-    # print('img_url:', img_url)
+    # 直接使用 UHD 高清图（不依赖图形环境探测屏幕尺寸）
+    img_url = img_url.replace('1920x1080', 'UHD')
     return img_url
 
 
