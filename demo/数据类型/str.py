@@ -1,3 +1,5 @@
+import json
+
 print("{} {}".format("hello", "world"))
 # tuple作为参数不能用format传，否则会出现index溢出
 print("%s %s" % ("hello", "world"))
@@ -66,3 +68,13 @@ print(colType[colType.find("(") + 1:colType.find(",")])
 str1 = "123"
 str2 = "456"
 print(f"""合并了每{str1},{str2}""")
+
+str3 = "666",
+str4 = "666"
+print(str3)
+print(str4)
+
+# json解析
+import json
+print(json.loads('[{"a":"b"}]')[0]['a'])
+print(json.loads('{"a":"b"}')['a'])
