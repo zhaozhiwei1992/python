@@ -84,12 +84,13 @@ def call_ai_meta(title: str, text: str) -> Optional[dict]:
 ---
 
 请严格按照以下 JSON 格式输出，不要有任何其他内容：
-{{"tags": "标签1,标签2,标签3", "categories": "分类名", "summary": "一句话摘要，不超过50字"}}
+{{"tags": "标签1,标签2,标签3", "categories": "分类名", "summary": "说明该功能干什么，不超过80字"}}
 
 要求：
 - tags：3-5个关键词，用英文逗号分隔，反映文档的技术主题
 - categories：一个简短的分类名，如"项目管理"、"支付系统"、"工作计划"等
-- summary：一句精炼的中文摘要，概括文档核心内容"""
+- summary：用业务语言说清这份文档对应的"功能/模块是干什么的、解决什么问题"，不超过80字；
+  不要出现"本文档/本文介绍了/本文描述了"等套话，也不要复述标题"""
 
     for attempt in range(RETRY_TIMES):
         try:
